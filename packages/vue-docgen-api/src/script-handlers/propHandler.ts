@@ -15,6 +15,7 @@ import getMemberFilter from '../utils/getPropsFilter'
 import getTemplateExpressionAST from '../utils/getTemplateExpressionAST'
 import parseValidatorForValues from './utils/parseValidator'
 import type { ParseOptions } from '../types'
+import getSpreadProperties from './utils/getSpreadProperties'
 
 type ValueLitteral = bt.StringLiteral | bt.BooleanLiteral | bt.NumericLiteral
 
@@ -62,7 +63,10 @@ export default async function propHandler(
 
 export async function describePropsFromValue(
 	documentation: Documentation,
-	propsValuePath: NodePath<bt.ObjectExpression, any> | NodePath<bt.ArrayExpression, any>,
+	propsValuePath:
+		| NodePath<bt.ObjectExpression, any>
+		| NodePath<bt.ArrayExpression, any>
+		| NodePath<bt.SpreadElement, any>,
 	ast: bt.File,
 	opt: ParseOptions,
 	modelPropertyName: string | null = null
@@ -71,12 +75,19 @@ export async function describePropsFromValue(
 		const objProp = propsValuePath.get('properties')
 
 		// filter non object properties
-		const objPropFiltered = objProp.filter((p: NodePath) =>
-			bt.isProperty(p.node)
+		const objPropFiltered = objProp.filter(
+			(p: NodePath) => bt.isProperty(p.node) || bt.isSpreadElement(p.node)
 		) as NodePath<bt.Property>[]
+
 		await Promise.all(
 			objPropFiltered.map(async prop => {
 				const propNode = prop.node
+
+				// If spread properties like on the vue 3, parse and recursive
+				if (bt.isSpreadElement(propNode)) {
+					const propsValuePath = await getSpreadProperties(propNode, opt, documentation)
+					await describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName)
+				}
 
 				// description
 				const docBlock = getDocblock(prop)
