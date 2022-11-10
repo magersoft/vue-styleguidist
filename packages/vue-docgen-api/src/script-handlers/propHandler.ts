@@ -213,10 +213,10 @@ export function describeType(
 						typeAnnotation.types.every(t => bt.isTSLiteralType(t))
 					) {
 						typeValues = typeAnnotation.types.map((t: bt.TSLiteralType) =>
-							// @ts-ignore
 							bt.isUnaryExpression(t.literal)
 								? t.literal.argument.toString()
-								: t.literal.value.toString()
+								: // @ts-ignore
+								  t.literal.value.toString()
 						)
 					}
 					return false
@@ -330,8 +330,8 @@ function getValuesFromTypePath(typeAnnotation: bt.TSType): string[] | undefined 
 
 export function getValuesFromTypeAnnotation(type: bt.TSType): string[] | undefined {
 	if (bt.isTSUnionType(type) && type.types.every(t => bt.isTSLiteralType(t))) {
-		// @ts-ignore
 		return type.types.map(t =>
+			// @ts-ignore
 			bt.isTSLiteralType(t) && !bt.isUnaryExpression(t.literal) ? t.literal.value.toString() : ''
 		)
 	}
