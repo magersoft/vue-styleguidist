@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseSource = exports.parseMulti = exports.parse = exports.getDefaultExample = exports.cleanName = exports.Documentation = exports.TemplateHandlers = exports.ScriptHandlers = void 0;
+const path_1 = __importDefault(require("path"));
 const Documentation_1 = __importDefault(require("./Documentation"));
 exports.Documentation = Documentation_1.default;
 const parse_1 = require("./parse");
@@ -88,6 +89,7 @@ function isOptionsObject(opts) {
 }
 function parsePrimitive(createDocs, filePath, opts) {
     return __awaiter(this, void 0, void 0, function* () {
+        filePath = path_1.default.resolve(filePath);
         const options = isOptionsObject(opts)
             ? Object.assign(Object.assign({ validExtends: (fullFilePath) => !/[\\/]node_modules[\\/]/.test(fullFilePath) }, opts), { filePath }) : {
             filePath,
