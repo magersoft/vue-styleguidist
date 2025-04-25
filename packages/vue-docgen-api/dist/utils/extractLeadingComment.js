@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const guards_1 = require("./guards");
+var guards_1 = require("./guards");
 /**
  * Extract leading comments to an html node
  * Even if the comment is on multiple lines it's still taken as a whole
@@ -13,8 +13,8 @@ function extractLeadingComment(siblings, templateAst) {
         return [];
     }
     // First find the position of the item in the siblings list
-    let i = siblings.length - 1;
-    let currentSlotIndex = -1;
+    var i = siblings.length - 1;
+    var currentSlotIndex = -1;
     do {
         if (siblings[i] === templateAst) {
             currentSlotIndex = i;
@@ -22,31 +22,35 @@ function extractLeadingComment(siblings, templateAst) {
     } while (currentSlotIndex < 0 && i--);
     // Find the first leading comment
     // get all siblings before the current node
-    const slotSiblingsBeforeSlot = siblings
+    var slotSiblingsBeforeSlot = siblings
         .slice(0, currentSlotIndex)
-        .filter(s => !(0, guards_1.isTextNode)(s))
+        .filter(function (s) { return !(0, guards_1.isTextNode)(s); })
         .reverse();
     // find the first node that is not a potential comment
-    const indexLastComment = slotSiblingsBeforeSlot.findIndex(sibling => !(0, guards_1.isCommentNode)(sibling) &&
-        !((0, guards_1.isInterpolationNode)(sibling) &&
-            (0, guards_1.isSimpleExpressionNode)(sibling.content) &&
-            isCodeOnlyJSComment(sibling.content.content)));
+    var indexLastComment = slotSiblingsBeforeSlot.findIndex(function (sibling) {
+        return !(0, guards_1.isCommentNode)(sibling) &&
+            !((0, guards_1.isInterpolationNode)(sibling) &&
+                (0, guards_1.isSimpleExpressionNode)(sibling.content) &&
+                isCodeOnlyJSComment(sibling.content.content));
+    });
     // cut the comments array on this index
-    const slotLeadingComments = (indexLastComment > 0
+    var slotLeadingComments = (indexLastComment > 0
         ? slotSiblingsBeforeSlot.slice(0, indexLastComment)
         : slotSiblingsBeforeSlot)
         .reverse()
-        .filter(s => (0, guards_1.isCommentNode)(s) || (0, guards_1.isInterpolationNode)(s));
+        .filter(function (s) { return (0, guards_1.isCommentNode)(s) || (0, guards_1.isInterpolationNode)(s); });
     // return each comment text
-    return slotLeadingComments.map(comment => (0, guards_1.isCommentNode)(comment)
-        ? comment.content.trim()
-        : (0, guards_1.isInterpolationNode)(comment) && (0, guards_1.isSimpleExpressionNode)(comment.content)
-            ? cleanUpComment(comment.content.content.trim())
-            : '');
+    return slotLeadingComments.map(function (comment) {
+        return (0, guards_1.isCommentNode)(comment)
+            ? comment.content.trim()
+            : (0, guards_1.isInterpolationNode)(comment) && (0, guards_1.isSimpleExpressionNode)(comment.content)
+                ? cleanUpComment(comment.content.content.trim())
+                : '';
+    });
 }
 exports.default = extractLeadingComment;
 function isCodeOnlyJSComment(code) {
-    const codeTrimmed = code.trim();
+    var codeTrimmed = code.trim();
     return (
     // check single-line comments
     isCodeOnlyJSCommentSingleLine(codeTrimmed) ||
@@ -54,7 +58,7 @@ function isCodeOnlyJSComment(code) {
         isCodeOnlyJSCommentMultiLine(codeTrimmed));
 }
 function isCodeOnlyJSCommentSingleLine(code) {
-    return code.split('\n').every(line => line.startsWith('//'));
+    return code.split('\n').every(function (line) { return line.startsWith('//'); });
 }
 function isCodeOnlyJSCommentMultiLine(code) {
     return (code.startsWith('/*') &&

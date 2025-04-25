@@ -27,12 +27,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseSlotDocBlock = exports.getSlotComment = void 0;
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const getDocblock_1 = require("../utils/getDocblock");
-const transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var getDocblock_1 = require("../utils/getDocblock");
+var transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
 /**
  * Extract slots information form the render function of an object-style VueJs component
  * @param documentation
@@ -40,28 +40,28 @@ const getProperties_1 = __importDefault(require("./utils/getProperties"));
  */
 function slotHandler(documentation, path) {
     if (bt.isObjectExpression(path.node)) {
-        const renderPath = (0, getProperties_1.default)(path, 'render');
+        var renderPath = (0, getProperties_1.default)(path, 'render');
         // if no prop return
         if (!renderPath.length) {
             return Promise.resolve();
         }
-        const renderValuePath = bt.isObjectProperty(renderPath[0].node)
+        var renderValuePath = bt.isObjectProperty(renderPath[0].node)
             ? renderPath[0].get('value')
             : renderPath[0];
         (0, recast_1.visit)(renderValuePath.node, {
             // this.$slots.default()
-            visitCallExpression(pathCall) {
-                if (bt.isMemberExpression(pathCall.node.callee) &&
-                    bt.isMemberExpression(pathCall.node.callee.object) &&
-                    bt.isThisExpression(pathCall.node.callee.object.object) &&
-                    bt.isIdentifier(pathCall.node.callee.property) &&
-                    bt.isIdentifier(pathCall.node.callee.object.property) &&
+            visitCallExpression: function (pathCall) {
+                if (pathCall.node.callee.type === 'MemberExpression' &&
+                    pathCall.node.callee.object.type === 'MemberExpression' &&
+                    pathCall.node.callee.object.object.type === 'ThisExpression' &&
+                    pathCall.node.callee.property.type === 'Identifier' &&
+                    pathCall.node.callee.object.property.type === 'Identifier' &&
                     (pathCall.node.callee.object.property.name === '$slots' ||
                         pathCall.node.callee.object.property.name === '$scopedSlots')) {
-                    const doc = documentation.getSlotDescriptor(pathCall.node.callee.property.name);
-                    const comment = getSlotComment(pathCall, doc);
-                    const bindings = pathCall.node.arguments[0];
-                    if (bt.isObjectExpression(bindings) && bindings.properties.length) {
+                    var doc = documentation.getSlotDescriptor(pathCall.node.callee.property.name);
+                    var comment = getSlotComment(pathCall, doc);
+                    var bindings = pathCall.node.arguments[0];
+                    if ((bindings === null || bindings === void 0 ? void 0 : bindings.type) === 'ObjectExpression' && bindings.properties.length) {
                         doc.bindings = getBindings(bindings, comment ? comment.bindings : undefined);
                     }
                     return false;
@@ -70,33 +70,35 @@ function slotHandler(documentation, path) {
                 return undefined;
             },
             // this.$slots.mySlot
-            visitMemberExpression(pathMember) {
-                if (bt.isMemberExpression(pathMember.node.object) &&
-                    bt.isThisExpression(pathMember.node.object.object) &&
-                    bt.isIdentifier(pathMember.node.object.property) &&
+            visitMemberExpression: function (pathMember) {
+                if (pathMember.node.object.type === 'MemberExpression' &&
+                    pathMember.node.object.object.type === 'ThisExpression' &&
+                    pathMember.node.object.property.type === 'Identifier' &&
                     (pathMember.node.object.property.name === '$slots' ||
                         pathMember.node.object.property.name === '$scopedSlots') &&
-                    bt.isIdentifier(pathMember.node.property)) {
-                    const doc = documentation.getSlotDescriptor(pathMember.node.property.name);
+                    pathMember.node.property.type === 'Identifier') {
+                    var doc = documentation.getSlotDescriptor(pathMember.node.property.name);
                     getSlotComment(pathMember, doc);
                     return false;
                 }
                 this.traverse(pathMember);
                 return undefined;
             },
-            visitJSXElement(pathJSX) {
-                const tagName = pathJSX.node.openingElement.name;
-                const nodeJSX = pathJSX.node;
-                if (bt.isJSXIdentifier(tagName) && tagName.name === 'slot') {
-                    const doc = documentation.getSlotDescriptor(getName(nodeJSX));
-                    const parentNode = pathJSX.parentPath.node;
-                    let comment;
+            visitJSXElement: function (pathJSX) {
+                var tagName = pathJSX.node.openingElement.name;
+                var nodeJSX = pathJSX.node;
+                if (tagName.type === 'JSXIdentifier' && tagName.name === 'slot') {
+                    var doc = documentation.getSlotDescriptor(getName(nodeJSX));
+                    var parentNode = pathJSX.parentPath.node;
+                    var comment_1;
                     if (bt.isJSXElement(parentNode)) {
-                        comment = getJSXDescription(nodeJSX, parentNode.children, doc);
+                        comment_1 = getJSXDescription(nodeJSX, parentNode.children, doc);
                     }
-                    const bindings = nodeJSX.openingElement.attributes;
+                    var bindings = nodeJSX.openingElement.attributes;
                     if (bindings && bindings.length) {
-                        doc.bindings = bindings.map((b) => getBindingsFromJSX(b, comment ? comment.bindings : undefined));
+                        doc.bindings = bindings.map(function (b) {
+                            return getBindingsFromJSX(b, comment_1 ? comment_1.bindings : undefined);
+                        });
                     }
                     return false;
                 }
@@ -113,16 +115,16 @@ function isStatement(path) {
         (bt.isDeclaration(path.node) || bt.isReturnStatement(path.node) || bt.isIfStatement(path.node)));
 }
 function getName(nodeJSX) {
-    const oe = nodeJSX.openingElement;
-    const names = oe.attributes.filter((a) => bt.isJSXAttribute(a) && a.name.name === 'name');
-    const nameNode = names.length ? names[0].value : null;
+    var oe = nodeJSX.openingElement;
+    var names = oe.attributes.filter(function (a) { return bt.isJSXAttribute(a) && a.name.name === 'name'; });
+    var nameNode = names.length ? names[0].value : null;
     return nameNode && bt.isStringLiteral(nameNode) ? nameNode.value : 'default';
 }
 function getJSXDescription(nodeJSX, siblings, descriptor) {
-    const indexInParent = siblings.indexOf(nodeJSX);
-    let commentExpression = null;
-    for (let i = indexInParent - 1; i > -1; i--) {
-        const currentNode = siblings[i];
+    var indexInParent = siblings.indexOf(nodeJSX);
+    var commentExpression = null;
+    for (var i = indexInParent - 1; i > -1; i--) {
+        var currentNode = siblings[i];
         if (bt.isJSXExpressionContainer(currentNode)) {
             commentExpression = currentNode;
             break;
@@ -131,19 +133,19 @@ function getJSXDescription(nodeJSX, siblings, descriptor) {
     if (!commentExpression || !commentExpression.expression.innerComments) {
         return undefined;
     }
-    const cmts = commentExpression.expression.innerComments;
-    const lastComment = cmts[cmts.length - 1];
+    var cmts = commentExpression.expression.innerComments;
+    var lastComment = cmts[cmts.length - 1];
     return parseCommentNode(lastComment, descriptor);
 }
 function getSlotComment(path, descriptor) {
-    const desc = getExpressionDescription(path, descriptor);
+    var desc = getExpressionDescription(path, descriptor);
     if (desc) {
         return desc;
     }
     // in case we don't find a description on the expression,
     // look for it on the containing statement
     // 1: find the statement
-    let i = 10;
+    var i = 10;
     while (i-- && path && !isStatement(path)) {
         path = path.parentPath;
     }
@@ -152,7 +154,7 @@ function getSlotComment(path, descriptor) {
 }
 exports.getSlotComment = getSlotComment;
 function getExpressionDescription(path, descriptor) {
-    const node = path.node;
+    var node = path.node;
     if (!node || !node.leadingComments || node.leadingComments.length === 0) {
         return undefined;
     }
@@ -166,44 +168,44 @@ function parseCommentNode(node, descriptor) {
 }
 function parseSlotDocBlock(str, descriptor) {
     var _a;
-    const docBlock = (0, getDocblock_1.parseDocblock)(str).trim();
-    const jsDoc = (0, getDoclets_1.default)(docBlock);
+    var docBlock = (0, getDocblock_1.parseDocblock)(str).trim();
+    var jsDoc = (0, getDoclets_1.default)(docBlock);
     if (!((_a = jsDoc.tags) === null || _a === void 0 ? void 0 : _a.length)) {
         return undefined;
     }
-    const slotTags = jsDoc.tags.filter(t => t.title === 'slot');
+    var slotTags = jsDoc.tags.filter(function (t) { return t.title === 'slot'; });
     if (slotTags.length) {
-        const tagContent = slotTags[0].content;
-        const description = typeof tagContent === 'string' ? tagContent : undefined;
+        var tagContent = slotTags[0].content;
+        var description = typeof tagContent === 'string' ? tagContent : undefined;
         if (description && (!descriptor.description || !descriptor.description.length)) {
             descriptor.description = description;
-            const fixedNameMatch = description.match(/^(\S+) - (.*)$/);
+            var fixedNameMatch = description.match(/^(\S+) - (.*)$/);
             if (fixedNameMatch) {
                 descriptor.name = fixedNameMatch[1];
                 descriptor.description = fixedNameMatch[2];
             }
         }
-        const tags = jsDoc.tags.filter(t => t.title !== 'slot' && t.title !== 'binding');
+        var tags = jsDoc.tags.filter(function (t) { return t.title !== 'slot' && t.title !== 'binding'; });
         if (tags.length) {
             descriptor.tags = (0, transformTagsIntoObject_1.default)(tags);
         }
         return {
-            bindings: jsDoc.tags.filter(t => t.title === 'binding')
+            bindings: jsDoc.tags.filter(function (t) { return t.title === 'binding'; })
         };
     }
     return undefined;
 }
 exports.parseSlotDocBlock = parseSlotDocBlock;
 function getBindings(node, bindingsFromComments) {
-    return node.properties.reduce((bindings, prop) => {
+    return node.properties.reduce(function (bindings, prop) {
         if (bt.isIdentifier(prop.key)) {
-            const name = prop.key.name;
-            const description = prop.leadingComments && prop.leadingComments.length
+            var name_1 = prop.key.name;
+            var description = prop.leadingComments && prop.leadingComments.length
                 ? (0, getDocblock_1.parseDocblock)(prop.leadingComments[prop.leadingComments.length - 1].value)
                 : undefined;
             if (!description) {
-                const descbinding = bindingsFromComments
-                    ? bindingsFromComments.filter(b => b.name === name)[0]
+                var descbinding = bindingsFromComments
+                    ? bindingsFromComments.filter(function (b) { return b.name === name_1; })[0]
                     : undefined;
                 if (descbinding) {
                     bindings.push(descbinding);
@@ -213,8 +215,8 @@ function getBindings(node, bindingsFromComments) {
             else {
                 bindings.push({
                     title: 'binding',
-                    name,
-                    description
+                    name: name_1,
+                    description: description
                 });
             }
         }
@@ -222,13 +224,13 @@ function getBindings(node, bindingsFromComments) {
     }, []);
 }
 function getBindingsFromJSX(attr, bindings) {
-    const name = attr.name.name;
-    const descbinding = bindings ? bindings.filter(b => b.name === name)[0] : undefined;
+    var name = attr.name.name;
+    var descbinding = bindings ? bindings.filter(function (b) { return b.name === name; })[0] : undefined;
     if (descbinding) {
         return descbinding;
     }
     return {
         title: 'binding',
-        name
+        name: name
     };
 }

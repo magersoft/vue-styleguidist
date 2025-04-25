@@ -5,7 +5,6 @@ import getTypeFromAnnotation, { decorateItem } from '../utils/getTypeFromAnnotat
 import type { Documentation } from '../Documentation'
 import { describePropsFromValue } from '../script-handlers/propHandler'
 import { defineHandler, getTypeDefinitionFromIdentifier } from './utils/tsUtils'
-
 /**
  * Extract information from an setup-style VueJs 3 component
  * about what props can be used with this component

@@ -23,35 +23,35 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
 /**
  *
  * @param ast
  * @param varNameFilter
  */
 function resolveRequired(ast, varNameFilter) {
-    const varToFilePath = {};
+    var varToFilePath = {};
     (0, recast_1.visit)(ast.program, {
-        visitImportDeclaration(astPath) {
-            const specifiers = astPath.get('specifiers');
+        visitImportDeclaration: function (astPath) {
+            var specifiers = astPath.get('specifiers');
             // if `import 'module'` without variable name cannot be a mixin
-            specifiers.each((sp) => {
-                const nodeSpecifier = sp.node;
+            specifiers.each(function (sp) {
+                var nodeSpecifier = sp.node;
                 if (bt.isImportDefaultSpecifier(nodeSpecifier) || bt.isImportSpecifier(nodeSpecifier)) {
-                    const localVariableName = nodeSpecifier.local.name;
-                    const exportName = bt.isImportDefaultSpecifier(nodeSpecifier)
+                    var localVariableName = nodeSpecifier.local.name;
+                    var exportName = bt.isImportDefaultSpecifier(nodeSpecifier)
                         ? 'default'
                         : bt.isIdentifier(nodeSpecifier.imported)
                             ? nodeSpecifier.imported.name
                             : 'default';
                     if (!varNameFilter || varNameFilter.indexOf(localVariableName) > -1) {
-                        const nodeSource = astPath.get('source').node;
+                        var nodeSource = astPath.get('source').node;
                         if (bt.isStringLiteral(nodeSource)) {
-                            const filePath = [nodeSource.value];
+                            var filePath = [nodeSource.value];
                             varToFilePath[localVariableName] = {
-                                filePath,
-                                exportName
+                                filePath: filePath,
+                                exportName: exportName
                             };
                         }
                     }
@@ -59,22 +59,22 @@ function resolveRequired(ast, varNameFilter) {
             });
             return false;
         },
-        visitVariableDeclaration(astPath) {
+        visitVariableDeclaration: function (astPath) {
             // only look at variable declarations
             if (!bt.isVariableDeclaration(astPath.node)) {
                 return false;
             }
-            astPath.node.declarations.forEach(nodeDeclaration => {
-                let sourceNode;
-                let source = '';
-                const { init, exportName } = nodeDeclaration.init && bt.isMemberExpression(nodeDeclaration.init)
+            astPath.node.declarations.forEach(function (nodeDeclaration) {
+                var sourceNode;
+                var source = '';
+                var _a = nodeDeclaration.init && bt.isMemberExpression(nodeDeclaration.init)
                     ? {
                         init: nodeDeclaration.init.object,
                         exportName: bt.isIdentifier(nodeDeclaration.init.property)
                             ? nodeDeclaration.init.property.name
                             : 'default'
                     }
-                    : { init: nodeDeclaration.init, exportName: 'default' };
+                    : { init: nodeDeclaration.init, exportName: 'default' }, init = _a.init, exportName = _a.exportName;
                 if (!init) {
                     return;
                 }
@@ -92,14 +92,14 @@ function resolveRequired(ast, varNameFilter) {
                     return;
                 }
                 if (bt.isIdentifier(nodeDeclaration.id)) {
-                    const varName = nodeDeclaration.id.name;
-                    varToFilePath[varName] = { filePath: [source], exportName };
+                    var varName = nodeDeclaration.id.name;
+                    varToFilePath[varName] = { filePath: [source], exportName: exportName };
                 }
                 else if (bt.isObjectPattern(nodeDeclaration.id)) {
-                    nodeDeclaration.id.properties.forEach((p) => {
+                    nodeDeclaration.id.properties.forEach(function (p) {
                         if (bt.isIdentifier(p.key)) {
-                            const varName = p.key.name;
-                            varToFilePath[varName] = { filePath: [source], exportName };
+                            var varName = p.key.name;
+                            varToFilePath[varName] = { filePath: [source], exportName: exportName };
                         }
                     });
                 }

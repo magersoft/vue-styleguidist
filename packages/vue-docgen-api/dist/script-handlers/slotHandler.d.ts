@@ -9,7 +9,7 @@ export interface TypedParamTag extends ParamTag {
  * @param path
  */
 export default function slotHandler(documentation: Documentation, path: NodePath): Promise<void>;
-declare type SlotComment = Pick<SlotDescriptor, 'bindings'>;
+type SlotComment = Pick<SlotDescriptor, 'bindings'>;
 export declare function getSlotComment(path: NodePath, descriptor: SlotDescriptor): SlotComment | undefined;
 export declare function parseSlotDocBlock(str: string, descriptor: SlotDescriptor): {
     bindings: (ParamTag | Tag)[];

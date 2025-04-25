@@ -11,16 +11,17 @@ exports.matchRecursiveRegExp = void 0;
  * @param right
  * @param flags
  */
-function matchRecursiveRegExp(str, left, right, flags = '') {
-    let f = flags;
-    const g = f.indexOf('g') > -1;
+function matchRecursiveRegExp(str, left, right, flags) {
+    if (flags === void 0) { flags = ''; }
+    var f = flags;
+    var g = f.indexOf('g') > -1;
     f = f.replace('g', '');
-    const x = new RegExp(`${left}|${right}`, `g${f}`);
-    const l = new RegExp(left, f.replace(/g/g, ''));
-    const a = [];
-    let s = -1;
-    let t;
-    let m;
+    var x = new RegExp("".concat(left, "|").concat(right), "g".concat(f));
+    var l = new RegExp(left, f.replace(/g/g, ''));
+    var a = [];
+    var s = -1;
+    var t;
+    var m;
     do {
         t = 0;
         while ((m = x.exec(str))) {

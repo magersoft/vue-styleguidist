@@ -1,1 +1,1 @@
-export default function <T>(creator: () => T, ...argsKey: string[]): T;
+export default function <T extends {}>(creator: () => T, ...argsKey: string[]): T;

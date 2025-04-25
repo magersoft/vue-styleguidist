@@ -26,21 +26,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const babel_parser_1 = __importDefault(require("../babel-parser"));
-const extractLeadingComment_1 = __importDefault(require("../utils/extractLeadingComment"));
-const slotHandler_1 = require("../script-handlers/slotHandler");
-const guards_1 = require("../utils/guards");
-const parser = (0, babel_parser_1.default)({ plugins: ['typescript'] });
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var babel_parser_1 = __importDefault(require("../babel-parser"));
+var extractLeadingComment_1 = __importDefault(require("../utils/extractLeadingComment"));
+var slotHandler_1 = require("../script-handlers/slotHandler");
+var guards_1 = require("../utils/guards");
+var parser = (0, babel_parser_1.default)({ plugins: ['typescript'] });
 function slotHandler(documentation, templateAst, siblings) {
+    var _a;
     if ((0, guards_1.isBaseElementNode)(templateAst) && templateAst.tag === 'slot') {
-        const nameProp = templateAst.props.filter(guards_1.isAttributeNode).find(b => b.name === 'name');
-        let slotName = nameProp && nameProp.value ? nameProp.value.content : undefined;
+        var nameProp = templateAst.props.filter(guards_1.isAttributeNode).find(function (b) { return b.name === 'name'; });
+        var slotName = nameProp && nameProp.value ? nameProp.value.content : undefined;
         if (!slotName) {
-            const dynExpr = templateAst.props
+            var dynExpr = templateAst.props
                 .filter(guards_1.isDirectiveNode)
-                .find(b => b.name === 'bind' && (0, guards_1.isSimpleExpressionNode)(b.arg) && b.arg.content === 'name');
+                .find(function (b) { return b.name === 'bind' && (0, guards_1.isSimpleExpressionNode)(b.arg) && b.arg.content === 'name'; });
             if (dynExpr && (0, guards_1.isSimpleExpressionNode)(dynExpr.exp) && dynExpr.exp) {
                 slotName = dynExpr.exp.content;
             }
@@ -48,48 +49,48 @@ function slotHandler(documentation, templateAst, siblings) {
                 slotName = 'default';
             }
         }
-        const bindings = templateAst.props.filter(
+        var bindings = templateAst.props.filter(
         // only keep simple binds and static attributes
-        b => b.name !== 'name' && (b.name === 'bind' || (0, guards_1.isAttributeNode)(b)));
-        const slotDescriptor = documentation.getSlotDescriptor(slotName);
+        function (b) { return b.name !== 'name' && (b.name === 'bind' || (0, guards_1.isAttributeNode)(b)); });
+        var slotDescriptor_1 = documentation.getSlotDescriptor(slotName);
         if (bindings.length) {
-            slotDescriptor.scoped = true;
+            slotDescriptor_1.scoped = true;
         }
-        const comments = (0, extractLeadingComment_1.default)(siblings, templateAst);
-        let bindingDescriptors = [];
-        comments.forEach(comment => {
+        var comments = (0, extractLeadingComment_1.default)(siblings, templateAst);
+        var bindingDescriptors_1 = [];
+        comments.forEach(function (comment) {
             // if a comment contains @slot,
             // use it to determine bindings and tags
             // if multiple @slot, use the last one
             if (comment.length) {
-                const doclets = (0, slotHandler_1.parseSlotDocBlock)(comment, slotDescriptor);
+                var doclets = (0, slotHandler_1.parseSlotDocBlock)(comment, slotDescriptor_1);
                 if (doclets && doclets.bindings) {
-                    bindingDescriptors = doclets.bindings;
+                    bindingDescriptors_1 = doclets.bindings;
                 }
             }
         });
-        const simpleBindings = [];
+        var simpleBindings_1 = [];
         // deal with v-bind="" props
-        const simpleVBind = bindings.find(b => (0, guards_1.isDirectiveNode)(b) && !b.arg);
-        let rawVBind = false;
+        var simpleVBind = bindings.find(function (b) { return (0, guards_1.isDirectiveNode)(b) && !b.arg; });
+        var rawVBind_1 = false;
         if (simpleVBind && (0, guards_1.isSimpleExpressionNode)(simpleVBind.exp)) {
-            const ast = parser.parse(`() => (${simpleVBind.exp.content})`);
+            var ast = parser.parse("() => (".concat(simpleVBind.exp.content, ")"));
             (0, recast_1.visit)(ast.program, {
-                visitObjectExpression(path) {
-                    path.get('properties').each((property) => {
-                        const node = property.node;
+                visitObjectExpression: function (path) {
+                    path.get('properties').each(function (property) {
+                        var node = property.node;
                         if (bt.isProperty(node) || bt.isObjectProperty(node)) {
-                            const name = (0, recast_1.print)(property.get('key')).code;
-                            const bindingDesc = bindingDescriptors.filter(t => t.name === name)[0];
-                            simpleBindings.push(bindingDesc
+                            var name_1 = (0, recast_1.print)(property.get('key')).code;
+                            var bindingDesc = bindingDescriptors_1.filter(function (t) { return t.name === name_1; })[0];
+                            simpleBindings_1.push(bindingDesc
                                 ? bindingDesc
                                 : {
-                                    name,
+                                    name: name_1,
                                     title: 'binding'
                                 });
                         }
                         else {
-                            rawVBind = true;
+                            rawVBind_1 = true;
                         }
                     });
                     return false;
@@ -97,18 +98,22 @@ function slotHandler(documentation, templateAst, siblings) {
             });
         }
         if (bindings.length) {
-            slotDescriptor.bindings = simpleBindings.concat(bindings.reduce((acc, b) => {
-                if (!rawVBind && (0, guards_1.isDirectiveNode)(b) && !b.arg) {
+            slotDescriptor_1.bindings = simpleBindings_1.concat(bindings.reduce(function (acc, b) {
+                if (!rawVBind_1 && (0, guards_1.isDirectiveNode)(b) && !b.arg) {
                     return acc;
                 }
                 // resolve name of binding
-                const name = (0, guards_1.isDirectiveNode)(b) && b.arg && (0, guards_1.isSimpleExpressionNode)(b.arg)
+                var name = (0, guards_1.isDirectiveNode)(b) && b.arg && (0, guards_1.isSimpleExpressionNode)(b.arg)
                     ? b.arg.content
-                    : `${(0, guards_1.isDirectiveNode)(b) ? 'v-' : ''}${b.name}`;
-                const bindingDesc = bindingDescriptors.filter(t => t.name === name)[0];
-                acc.push(bindingDesc ? bindingDesc : { name, title: 'binding' });
+                    : "".concat((0, guards_1.isDirectiveNode)(b) ? 'v-' : '').concat(b.name);
+                var bindingDesc = bindingDescriptors_1.filter(function (t) { return t.name === name; })[0];
+                acc.push(bindingDesc ? bindingDesc : { name: name, title: 'binding' });
                 return acc;
             }, []));
+        }
+        var restOfBindings = bindingDescriptors_1.filter(function (bindFromComment) { var _a; return !((_a = slotDescriptor_1.bindings) === null || _a === void 0 ? void 0 : _a.some(function (bindFromData) { return bindFromData.title === bindFromComment.title; })); });
+        if (restOfBindings.length) {
+            slotDescriptor_1.bindings = (_a = slotDescriptor_1.bindings) === null || _a === void 0 ? void 0 : _a.concat(restOfBindings);
         }
     }
 }

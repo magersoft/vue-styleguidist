@@ -1,5 +1,5 @@
 import { ImportedVariableSet } from './resolveRequired';
-import { ParseOptions } from '../parse';
+import type { ParseOptions } from '../types';
 import Documentation from '../Documentation';
 /**
  * Document all components in varToFilePath in documentation
@@ -10,4 +10,4 @@ import Documentation from '../Documentation';
  * @param originObject to build the origin flag
  * @param opt parsing options
  */
-export default function documentRequiredComponents(documentation: Documentation | undefined, varToFilePath: ImportedVariableSet, originObject: 'extends' | 'mixin' | undefined, opt: ParseOptions): Promise<Documentation[]>;
+export default function documentRequiredComponents(parseFile: (opt: ParseOptions, documentation?: Documentation) => Promise<Documentation[]>, documentation: Documentation | undefined, varToFilePath: ImportedVariableSet, originObject: 'extends' | 'mixin' | undefined, opt: ParseOptions): Promise<Documentation[]>;

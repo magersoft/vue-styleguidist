@@ -26,10 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const slotHandler_1 = require("./slotHandler");
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var slotHandler_1 = require("./slotHandler");
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
 /**
  * Extract slots information form the render function of an object-style VueJs component
  * @param documentation
@@ -38,30 +38,30 @@ const getProperties_1 = __importDefault(require("./utils/getProperties"));
 function slotHandler(documentation, path) {
     var _a;
     if (bt.isObjectExpression(path.node)) {
-        const functionalPath = (0, getProperties_1.default)(path, 'functional');
+        var functionalPath = (0, getProperties_1.default)(path, 'functional');
         // if no prop return
         if (!functionalPath.length || !functionalPath[0].get('value')) {
             return Promise.resolve();
         }
-        const renderPath = (0, getProperties_1.default)(path, 'render');
+        var renderPath = (0, getProperties_1.default)(path, 'render');
         if (!renderPath || !renderPath.length) {
             return Promise.resolve();
         }
-        const renderValuePath = bt.isObjectProperty(renderPath[0].node)
+        var renderValuePath = bt.isObjectProperty(renderPath[0].node)
             ? renderPath[0].get('value')
             : renderPath[0];
-        const contextVariable = renderValuePath.get('params', 1);
+        var contextVariable = renderValuePath.get('params', 1);
         if (contextVariable.value) {
             if (bt.isIdentifier(contextVariable.value)) {
-                const contextVariableName = contextVariable.value.name;
+                var contextVariableName_1 = contextVariable.value.name;
                 (0, recast_1.visit)(renderValuePath.node, {
                     // context.children
-                    visitMemberExpression(pathMember) {
-                        if (bt.isIdentifier(pathMember.node.object) &&
-                            pathMember.node.object.name === contextVariableName &&
-                            bt.isIdentifier(pathMember.node.property) &&
+                    visitMemberExpression: function (pathMember) {
+                        if (pathMember.node.object.type === 'Identifier' &&
+                            pathMember.node.object.name === contextVariableName_1 &&
+                            pathMember.node.property.type === 'Identifier' &&
                             pathMember.node.property.name === 'children') {
-                            const doc = documentation.getSlotDescriptor('default');
+                            var doc = documentation.getSlotDescriptor('default');
                             (0, slotHandler_1.getSlotComment)(pathMember, doc);
                             return false;
                         }
@@ -71,14 +71,14 @@ function slotHandler(documentation, path) {
                 });
             }
             else {
-                const childrenVarValueName = (_a = contextVariable
+                var childrenVarValueName_1 = (_a = contextVariable
                     .get('properties')
-                    .value.filter((a) => bt.isIdentifier(a.key) && a.key.name === 'children')[0]) === null || _a === void 0 ? void 0 : _a.value.name;
+                    .value.filter(function (a) { return bt.isIdentifier(a.key) && a.key.name === 'children'; })[0]) === null || _a === void 0 ? void 0 : _a.value.name;
                 (0, recast_1.visit)(renderValuePath.node, {
                     // destructured children
-                    visitIdentifier(pathMember) {
-                        if (pathMember.node.name === childrenVarValueName) {
-                            const doc = documentation.getSlotDescriptor('default');
+                    visitIdentifier: function (pathMember) {
+                        if (pathMember.node.name === childrenVarValueName_1) {
+                            var doc = documentation.getSlotDescriptor('default');
                             (0, slotHandler_1.getSlotComment)(pathMember, doc);
                             return false;
                         }

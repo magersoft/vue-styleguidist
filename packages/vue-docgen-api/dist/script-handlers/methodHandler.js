@@ -27,12 +27,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setMethodDescriptor = void 0;
-const bt = __importStar(require("@babel/types"));
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const getTypeFromAnnotation_1 = __importDefault(require("../utils/getTypeFromAnnotation"));
-const transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
+var bt = __importStar(require("@babel/types"));
+var getDocblock_1 = __importDefault(require("../utils/getDocblock"));
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var getTypeFromAnnotation_1 = __importDefault(require("../utils/getTypeFromAnnotation"));
+var transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
 /**
  * Extracts methods information from an object-style VueJs component
  * @param documentation
@@ -41,19 +41,19 @@ const getProperties_1 = __importDefault(require("./utils/getProperties"));
 function methodHandler(documentation, path) {
     var _a;
     if (bt.isObjectExpression(path.node)) {
-        const exposePath = (0, getProperties_1.default)(path, 'expose');
-        const exposeArray = ((_a = exposePath[0]) === null || _a === void 0 ? void 0 : _a.get('value', 'elements').map((el) => el.value.value)) || [];
-        const methodsPath = (0, getProperties_1.default)(path, 'methods');
+        var exposePath = (0, getProperties_1.default)(path, 'expose');
+        var exposeArray_1 = ((_a = exposePath[0]) === null || _a === void 0 ? void 0 : _a.get('value', 'elements').map(function (el) { return el.value.value; })) || [];
+        var methodsPath = (0, getProperties_1.default)(path, 'methods');
         // if no method return
         if (!methodsPath.length) {
             return Promise.resolve();
         }
-        const methodsObject = methodsPath[0].get('value');
+        var methodsObject = methodsPath[0].get('value');
         if (bt.isObjectExpression(methodsObject.node)) {
-            methodsObject.get('properties').each((p) => {
-                let methodName = '<anonymous>';
+            methodsObject.get('properties').each(function (p) {
+                var methodName = '<anonymous>';
                 if (bt.isObjectProperty(p.node) && bt.isIdentifier(p.node.key)) {
-                    const val = p.get('value');
+                    var val = p.get('value');
                     methodName = p.node.key.name;
                     if (!Array.isArray(val)) {
                         p = val;
@@ -61,15 +61,15 @@ function methodHandler(documentation, path) {
                 }
                 methodName =
                     bt.isObjectMethod(p.node) && bt.isIdentifier(p.node.key) ? p.node.key.name : methodName;
-                const docBlock = (0, getDocblock_1.default)(bt.isObjectMethod(p.node) ? p : p.parentPath);
-                const jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
-                const jsDocTags = jsDoc.tags ? jsDoc.tags : [];
+                var docBlock = (0, getDocblock_1.default)(bt.isObjectMethod(p.node) ? p : p.parentPath);
+                var jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
+                var jsDocTags = jsDoc.tags ? jsDoc.tags : [];
                 // ignore the method if there is no public tag
-                if (!jsDocTags.some((t) => t.title === 'access' && t.content === 'public') &&
-                    !exposeArray.includes(methodName)) {
+                if (!jsDocTags.some(function (t) { return t.title === 'access' && t.content === 'public'; }) &&
+                    !exposeArray_1.includes(methodName)) {
                     return;
                 }
-                const methodDescriptor = documentation.getMethodDescriptor(methodName);
+                var methodDescriptor = documentation.getMethodDescriptor(methodName);
                 if (jsDoc.description) {
                     methodDescriptor.description = jsDoc.description;
                 }
@@ -82,9 +82,9 @@ function methodHandler(documentation, path) {
 exports.default = methodHandler;
 function setMethodDescriptor(methodDescriptor, method, jsDocTags) {
     // params
-    describeParams(method, methodDescriptor, jsDocTags.filter(tag => ['param', 'arg', 'argument'].indexOf(tag.title) >= 0));
+    describeParams(method, methodDescriptor, jsDocTags.filter(function (tag) { return ['param', 'arg', 'argument'].indexOf(tag.title) >= 0; }));
     // returns
-    describeReturns(method, methodDescriptor, jsDocTags.filter(t => t.title === 'returns'));
+    describeReturns(method, methodDescriptor, jsDocTags.filter(function (t) { return t.title === 'returns'; }));
     // tags
     methodDescriptor.tags = (0, transformTagsIntoObject_1.default)(jsDocTags);
     return methodDescriptor;
@@ -92,13 +92,13 @@ function setMethodDescriptor(methodDescriptor, method, jsDocTags) {
 exports.setMethodDescriptor = setMethodDescriptor;
 function describeParams(methodPath, methodDescriptor, jsDocParamTags) {
     // if there is no parameter no need to parse them
-    const fExp = methodPath.node;
+    var fExp = methodPath.node;
     if (!fExp.params || !jsDocParamTags || (!fExp.params.length && !jsDocParamTags.length)) {
         return;
     }
-    const params = [];
-    fExp.params.forEach((par, i) => {
-        let name;
+    var params = [];
+    fExp.params.forEach(function (par, i) {
+        var name;
         if (bt.isIdentifier(par)) {
             // simple params
             name = par.name;
@@ -111,15 +111,15 @@ function describeParams(methodPath, methodDescriptor, jsDocParamTags) {
             // unrecognized pattern
             return;
         }
-        const jsDocTags = jsDocParamTags.filter(tag => tag.name === name);
-        let jsDocTag = jsDocTags.length ? jsDocTags[0] : undefined;
+        var jsDocTags = jsDocParamTags.filter(function (tag) { return tag.name === name; });
+        var jsDocTag = jsDocTags.length ? jsDocTags[0] : undefined;
         // if tag is not namely described try finding it by its order
         if (!jsDocTag) {
             if (jsDocParamTags[i] && !jsDocParamTags[i].name) {
                 jsDocTag = jsDocParamTags[i];
             }
         }
-        const param = { name };
+        var param = { name: name };
         if (jsDocTag) {
             if (jsDocTag.type) {
                 param.type = jsDocTag.type;
@@ -129,7 +129,7 @@ function describeParams(methodPath, methodDescriptor, jsDocParamTags) {
             }
         }
         if (!param.type && par.typeAnnotation) {
-            const type = (0, getTypeFromAnnotation_1.default)(par.typeAnnotation);
+            var type = (0, getTypeFromAnnotation_1.default)(par.typeAnnotation);
             if (type) {
                 param.type = type;
             }
@@ -138,7 +138,7 @@ function describeParams(methodPath, methodDescriptor, jsDocParamTags) {
     });
     // in case the arguments are abstracted (using the arguments keyword)
     if (!params.length) {
-        jsDocParamTags.forEach(doc => {
+        jsDocParamTags.forEach(function (doc) {
             params.push(doc);
         });
     }
@@ -148,16 +148,16 @@ function describeParams(methodPath, methodDescriptor, jsDocParamTags) {
 }
 function describeReturns(methodPath, methodDescriptor, jsDocReturnTags) {
     if (jsDocReturnTags.length) {
-        const ret = jsDocReturnTags[0];
+        var ret = jsDocReturnTags[0];
         if (ret.name && ret.description) {
-            ret.description = `${ret.name} ${ret.description}`;
+            ret.description = "".concat(ret.name, " ").concat(ret.description);
         }
         methodDescriptor.returns = ret;
     }
     if (!methodDescriptor.returns || !methodDescriptor.returns.type) {
-        const methodNode = methodPath.node;
+        var methodNode = methodPath.node;
         if (methodNode.returnType) {
-            const type = (0, getTypeFromAnnotation_1.default)(methodNode.returnType);
+            var type = (0, getTypeFromAnnotation_1.default)(methodNode.returnType);
             if (type) {
                 methodDescriptor.returns = methodDescriptor.returns || {};
                 methodDescriptor.returns.type = type;

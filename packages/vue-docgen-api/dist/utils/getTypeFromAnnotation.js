@@ -27,11 +27,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decorateItem = void 0;
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const getDocblock_1 = __importDefault(require("./getDocblock"));
-const getDoclets_1 = __importDefault(require("./getDoclets"));
-const transformTagsIntoObject_1 = __importDefault(require("./transformTagsIntoObject"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var getDocblock_1 = __importDefault(require("./getDocblock"));
+var getDoclets_1 = __importDefault(require("./getDoclets"));
+var transformTagsIntoObject_1 = __importDefault(require("./transformTagsIntoObject"));
 function getTypeFromAnnotation(typeNode) {
     if (typeNode) {
         if (bt.isTSTypeAnnotation(typeNode)) {
@@ -44,7 +44,7 @@ function getTypeFromAnnotation(typeNode) {
     return undefined;
 }
 exports.default = getTypeFromAnnotation;
-const TS_TYPE_NAME_MAP = {
+var TS_TYPE_NAME_MAP = {
     TSAnyKeyword: 'any',
     TSUnknownKeyword: 'unknown',
     TSNumberKeyword: 'number',
@@ -58,14 +58,15 @@ const TS_TYPE_NAME_MAP = {
     TSNeverKeyword: 'never',
     TSArrayType: 'Array',
     TSUnionType: 'union',
-    TSIntersectionType: 'intersection'
+    TSIntersectionType: 'intersection',
+    TSTupleType: 'tuple'
 };
 function printType(t) {
     var _a;
     if (!t) {
         return { name: '' };
     }
-    if (bt.isTSLiteralType(t) && !bt.isUnaryExpression(t.literal)) {
+    if (bt.isTSLiteralType(t) && !bt.isUnaryExpression(t.literal) && !bt.isTemplateLiteral(t.literal)) {
         return { name: JSON.stringify(t.literal.value) };
     }
     if (bt.isTSTypeLiteral(t)) {
@@ -74,7 +75,7 @@ function printType(t) {
         };
     }
     if (bt.isTSTypeReference(t) && bt.isIdentifier(t.typeName)) {
-        const out = { name: t.typeName.name };
+        var out = { name: t.typeName.name };
         if ((_a = t.typeParameters) === null || _a === void 0 ? void 0 : _a.params) {
             out.elements = t.typeParameters.params.map(getTypeObjectFromTSType);
         }
@@ -86,13 +87,27 @@ function printType(t) {
     return { name: t.type };
 }
 function getTypeObjectFromTSType(type) {
-    return bt.isTSUnionType(type) || bt.isTSIntersectionType(type)
-        ? { name: TS_TYPE_NAME_MAP[type.type], elements: type.types.map(getTypeObjectFromTSType) }
-        : bt.isTSArrayType(type)
-            ? { name: TS_TYPE_NAME_MAP[type.type], elements: [getTypeObjectFromTSType(type.elementType)] }
-            : printType(type);
+    if (bt.isTSUnionType(type) || bt.isTSIntersectionType(type)) {
+        return { name: TS_TYPE_NAME_MAP[type.type], elements: type.types.map(getTypeObjectFromTSType) };
+    }
+    if (bt.isTSArrayType(type)) {
+        return {
+            name: TS_TYPE_NAME_MAP[type.type],
+            elements: [getTypeObjectFromTSType(type.elementType)]
+        };
+    }
+    if (bt.isTSTupleType(type)) {
+        return {
+            name: TS_TYPE_NAME_MAP[type.type],
+            elements: type.elementTypes.map(getTypeObjectFromTSType)
+        };
+    }
+    if (bt.isTSNamedTupleMember(type)) {
+        return getTypeObjectFromTSType(type.elementType);
+    }
+    return printType(type);
 }
-const FLOW_TYPE_NAME_MAP = {
+var FLOW_TYPE_NAME_MAP = {
     AnyTypeAnnotation: 'any',
     UnknownTypeAnnotation: 'unknown',
     NumberTypeAnnotation: 'number',
@@ -106,17 +121,17 @@ const FLOW_TYPE_NAME_MAP = {
     NeverTypeAnnotation: 'never'
 };
 function getTypeObjectFromFlowType(type) {
-    const name = FLOW_TYPE_NAME_MAP[type.type]
+    var name = FLOW_TYPE_NAME_MAP[type.type]
         ? FLOW_TYPE_NAME_MAP[type.type]
         : bt.isGenericTypeAnnotation(type) && bt.isIdentifier(type.id)
             ? type.id.name
             : type.type;
-    return { name };
+    return { name: name };
 }
 function decorateItem(item, propDescriptor) {
-    const docBlock = (0, getDocblock_1.default)(item);
-    const jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
-    const jsDocTags = jsDoc.tags ? jsDoc.tags : [];
+    var docBlock = (0, getDocblock_1.default)(item);
+    var jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
+    var jsDocTags = jsDoc.tags ? jsDoc.tags : [];
     if (jsDoc.description) {
         propDescriptor.description = jsDoc.description;
     }

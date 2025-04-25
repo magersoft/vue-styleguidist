@@ -1,7 +1,7 @@
 import * as bt from '@babel/types';
 import { NodePath } from 'ast-types/lib/node-path';
 import Documentation, { PropDescriptor } from '../Documentation';
-import { ParseOptions } from '../parse';
+import type { ParseOptions } from '../types';
 export declare function getRawValueParsedFromFunctionsBlockStatementNode(blockStatementNode: bt.BlockStatement): string | null;
 /**
  * Extract props information form an object-style VueJs component
@@ -9,7 +9,7 @@ export declare function getRawValueParsedFromFunctionsBlockStatementNode(blockSt
  * @param path
  */
 export default function propHandler(documentation: Documentation, path: NodePath, ast: bt.File, opt: ParseOptions): Promise<void>;
-export declare function describePropsFromValue(documentation: Documentation, propsValuePath: NodePath<bt.ObjectExpression, any> | NodePath<bt.ArrayExpression, any> | NodePath<bt.SpreadElement, any>, ast: bt.File, opt: ParseOptions, modelPropertyName?: string | null): Promise<void>;
+export declare function describePropsFromValue(documentation: Documentation, propsValuePath: NodePath<bt.ObjectExpression, any> | NodePath<bt.ArrayExpression, any> | NodePath<bt.SpreadElement, any>, ast: bt.File, opt: ParseOptions, modelPropertyName?: string | null, composableFullfilePath?: string): Promise<void>;
 /**
  * Deal with the description of the type
  * @param propPropertiesPath
@@ -17,7 +17,7 @@ export declare function describePropsFromValue(documentation: Documentation, pro
  * @returns the unaltered type member of the prop object
  */
 export declare function describeType(propPropertiesPath: NodePath<bt.ObjectProperty | bt.ObjectMethod>[], propDescriptor: PropDescriptor): string | undefined;
-export declare function getTypeFromTypePath(typePath: NodePath<bt.TSAsExpression | bt.Identifier>): {
+export declare function getTypeFromTypePath(typePath: NodePath<bt.TSAsExpression | bt.Identifier | bt.ObjectProperty>): {
     name: string;
     func?: boolean;
 };

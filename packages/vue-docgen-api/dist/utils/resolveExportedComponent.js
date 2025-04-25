@@ -26,31 +26,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const ts_map_1 = __importDefault(require("ts-map"));
-const isExportedAssignment_1 = __importDefault(require("./isExportedAssignment"));
-const resolveExportDeclaration_1 = __importDefault(require("./resolveExportDeclaration"));
-const resolveIdentifier_1 = __importDefault(require("./resolveIdentifier"));
-const resolveRequired_1 = __importDefault(require("./resolveRequired"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var ts_map_1 = __importDefault(require("ts-map"));
+var isExportedAssignment_1 = __importDefault(require("./isExportedAssignment"));
+var resolveExportDeclaration_1 = __importDefault(require("./resolveExportDeclaration"));
+var resolveIdentifier_1 = __importDefault(require("./resolveIdentifier"));
+var resolveRequired_1 = __importDefault(require("./resolveRequired"));
 function ignore() {
     return false;
 }
 /**
  * List of all keys that could contain documentation
  */
-const VUE_COMPONENTS_KEYS = ['data', 'props', 'methods', 'computed', 'emits'];
+var VUE_COMPONENTS_KEYS = ['data', 'props', 'methods', 'computed', 'emits'];
 function isObjectExpressionComponentDefinition(node) {
     return (
     // export const test = {}
     node.properties.length === 0 ||
         // export const compo = {data(){ return {cpm:"Button"}}
-        node.properties.some(p => (bt.isObjectMethod(p) || bt.isObjectProperty(p)) &&
-            bt.isIdentifier(p.key) &&
-            VUE_COMPONENTS_KEYS.includes(p.key.name)));
+        node.properties.some(function (p) {
+            return (bt.isObjectMethod(p) || bt.isObjectProperty(p)) &&
+                bt.isIdentifier(p.key) &&
+                VUE_COMPONENTS_KEYS.includes(p.key.name);
+        }));
 }
 function isComponentDefinition(path) {
-    const { node } = path;
+    var node = path.node;
     return (
     // export default {} (always exported even when empty)
     bt.isObjectExpression(node) ||
@@ -71,10 +73,10 @@ function isComponentDefinition(path) {
         false);
 }
 function getReturnStatementObject(realDef) {
-    let returnedObjectPath;
+    var returnedObjectPath;
     (0, recast_1.visit)(realDef.get('body'), {
-        visitReturnStatement(rPath) {
-            const returnArg = rPath.get('argument');
+        visitReturnStatement: function (rPath) {
+            var returnArg = rPath.get('argument');
             if (bt.isObjectExpression(returnArg.node)) {
                 returnedObjectPath = returnArg;
             }
@@ -84,7 +86,7 @@ function getReturnStatementObject(realDef) {
     return returnedObjectPath;
 }
 function getReturnedObject(realDef) {
-    const { node } = realDef;
+    var node = realDef.node;
     if (bt.isArrowFunctionExpression(node)) {
         if (bt.isObjectExpression(realDef.get('body').node)) {
             return realDef.get('body');
@@ -108,9 +110,9 @@ function getReturnedObject(realDef) {
  * export var Definition = ...;
  */
 function resolveExportedComponent(ast) {
-    const components = new ts_map_1.default();
-    const ievPureExports = {};
-    const nonComponentsIdentifiers = [];
+    var components = new ts_map_1.default();
+    var ievPureExports = {};
+    var nonComponentsIdentifiers = [];
     function setComponent(exportName, definition) {
         if (definition && !components.get(exportName)) {
             components.set(exportName, normalizeComponentPath(definition));
@@ -120,10 +122,10 @@ function resolveExportedComponent(ast) {
     // in extenso export default or export myvar
     function exportDeclaration(path) {
         var _a;
-        const definitions = (0, resolveExportDeclaration_1.default)(path);
+        var definitions = (0, resolveExportDeclaration_1.default)(path);
         // if it is a pure export { compo } from "./compo" load the source here
-        const sourcePath = (_a = path.get('source').value) === null || _a === void 0 ? void 0 : _a.value;
-        definitions.forEach((definition, name) => {
+        var sourcePath = (_a = path.get('source').value) === null || _a === void 0 ? void 0 : _a.value;
+        definitions.forEach(function (definition, name) {
             if (sourcePath) {
                 ievPureExports[name] = {
                     exportName: definition.value.name,
@@ -136,13 +138,13 @@ function resolveExportedComponent(ast) {
                 if (bt.isTSAsExpression(definition.node)) {
                     definition = definition.get('expression');
                 }
-                const realDef = (0, resolveIdentifier_1.default)(ast, definition);
+                var realDef = (0, resolveIdentifier_1.default)(ast, definition);
                 if (realDef) {
                     if (isComponentDefinition(realDef)) {
                         setComponent(name, realDef);
                     }
                     else {
-                        const returnedObject = getReturnedObject(realDef);
+                        var returnedObject = getReturnedObject(realDef);
                         if (returnedObject && isObjectExpressionComponentDefinition(returnedObject.node)) {
                             setComponent(name, returnedObject);
                         }
@@ -172,7 +174,7 @@ function resolveExportedComponent(ast) {
         visitDeclareExportDeclaration: exportDeclaration,
         visitExportNamedDeclaration: exportDeclaration,
         visitExportDefaultDeclaration: exportDeclaration,
-        visitAssignmentExpression(path) {
+        visitAssignmentExpression: function (path) {
             // function run on every assignments (with an =)
             // Ignore anything that is not `exports.X = ...;` or
             // `module.exports = ...;`
@@ -181,10 +183,10 @@ function resolveExportedComponent(ast) {
             }
             // Resolve the value of the right hand side. It should resolve to a call
             // expression, something like Vue.extend({})
-            const pathRight = path.get('right');
-            const pathLeft = path.get('left');
-            const realComp = (0, resolveIdentifier_1.default)(ast, pathRight);
-            const name = bt.isMemberExpression(pathLeft.node) &&
+            var pathRight = path.get('right');
+            var pathLeft = path.get('left');
+            var realComp = (0, resolveIdentifier_1.default)(ast, pathRight);
+            var name = bt.isMemberExpression(pathLeft.node) &&
                 bt.isIdentifier(pathLeft.node.property) &&
                 pathLeft.node.property.name !== 'exports'
                 ? pathLeft.node.property.name
@@ -194,7 +196,7 @@ function resolveExportedComponent(ast) {
                     setComponent(name, realComp);
                 }
                 else {
-                    const returnedObject = getReturnedObject(realComp);
+                    var returnedObject = getReturnedObject(realComp);
                     if (returnedObject && isObjectExpressionComponentDefinition(returnedObject.node)) {
                         setComponent(name, returnedObject);
                     }
@@ -206,7 +208,7 @@ function resolveExportedComponent(ast) {
             return false;
         }
     });
-    const requiredValues = Object.assign(ievPureExports, (0, resolveRequired_1.default)(ast, nonComponentsIdentifiers));
+    var requiredValues = Object.assign(ievPureExports, (0, resolveRequired_1.default)(ast, nonComponentsIdentifiers));
     return [components, requiredValues];
 }
 exports.default = resolveExportedComponent;

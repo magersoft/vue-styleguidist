@@ -1,12 +1,18 @@
-import Documentation, { ComponentDoc, PropDescriptor, SlotDescriptor, EventDescriptor, MethodDescriptor, BlockTag, Param, Tag, ParamTag, ParamType } from './Documentation';
-import { DocGenOptions, ParseOptions } from './parse';
+import Documentation, { ComponentDoc, PropDescriptor, SlotDescriptor, EventDescriptor, MethodDescriptor, ExposeDescriptor, BlockTag, Param, Tag, ParamTag, ParamType } from './Documentation';
+import type { ParseOptions, DocGenOptions } from './types';
 import * as ScriptHandlers from './script-handlers';
 import * as TemplateHandlers from './template-handlers';
+import getDoclets from './utils/getDoclets';
+import getProperties from './script-handlers/utils/getProperties';
+import getDocblock from './utils/getDocblock';
 export { ScriptHandlers };
 export { TemplateHandlers };
+export { getDoclets };
+export { getProperties };
+export { getDocblock };
 export { TemplateParserOptions } from './parse-template';
 export { ScriptHandler, TemplateHandler } from './parse';
-export { ComponentDoc, DocGenOptions, ParseOptions, Documentation, BlockTag, PropDescriptor, SlotDescriptor, EventDescriptor, MethodDescriptor, Param, Tag, ParamTag, ParamType };
+export { ComponentDoc, DocGenOptions, ParseOptions, Documentation, BlockTag, PropDescriptor, SlotDescriptor, EventDescriptor, MethodDescriptor, ExposeDescriptor, Param, Tag, ParamTag, ParamType };
 export { cleanName, getDefaultExample } from 'vue-inbrowser-compiler-independent-utils';
 /**
  * Parse the component at filePath and return props, public methods, events and slots

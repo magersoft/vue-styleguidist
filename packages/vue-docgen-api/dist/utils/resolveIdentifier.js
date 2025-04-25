@@ -23,8 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
 function ignore() {
     return false;
 }
@@ -32,8 +32,8 @@ function resolveIdentifier(ast, path) {
     if (!bt.isIdentifier(path.node)) {
         return path;
     }
-    const varName = path.node.name;
-    let comp = null;
+    var varName = path.node.name;
+    var comp = null;
     (0, recast_1.visit)(ast.program, {
         // to look only at the root we ignore all traversing
         visitFunctionDeclaration: ignore,
@@ -46,20 +46,21 @@ function resolveIdentifier(ast, path) {
         visitDoWhileStatement: ignore,
         visitForStatement: ignore,
         visitForInStatement: ignore,
-        visitVariableDeclaration(variablePath) {
-            if (!bt.isVariableDeclaration(variablePath.node)) {
+        visitVariableDeclaration: function (variablePath) {
+            if (variablePath.node.type !== 'VariableDeclaration') {
                 return false;
             }
-            const varID = variablePath.node.declarations[0].id;
-            if (!varID || !bt.isIdentifier(varID) || varID.name !== varName) {
+            var firstDeclaration = variablePath.node.declarations[0];
+            var varID = firstDeclaration.type === 'VariableDeclarator' ? firstDeclaration.id : firstDeclaration;
+            if (!varID || varID.type !== 'Identifier' || varID.name !== varName) {
                 return false;
             }
             comp = variablePath.get('declarations', 0).get('init');
             return false;
         },
-        visitClassDeclaration(classPath) {
-            const classID = classPath.node.id;
-            if (!classID || !bt.isIdentifier(classID) || classID.name !== varName) {
+        visitClassDeclaration: function (classPath) {
+            var classID = classPath.node.id;
+            if (!classID || classID.type !== 'Identifier' || classID.name !== varName) {
                 return false;
             }
             comp = classPath;

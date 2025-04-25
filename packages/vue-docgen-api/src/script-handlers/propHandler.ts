@@ -15,7 +15,7 @@ import getMemberFilter from '../utils/getPropsFilter'
 import getTemplateExpressionAST from '../utils/getTemplateExpressionAST'
 import parseValidatorForValues from './utils/parseValidator'
 import type { ParseOptions } from '../types'
-import getSpreadProperties from './utils/getSpreadProperties'
+import parseSpreadProperties from './utils/parseSpreadProperties'
 
 type ValueLitteral = bt.StringLiteral | bt.BooleanLiteral | bt.NumericLiteral
 
@@ -69,7 +69,8 @@ export async function describePropsFromValue(
 		| NodePath<bt.SpreadElement, any>,
 	ast: bt.File,
 	opt: ParseOptions,
-	modelPropertyName: string | null = null
+	modelPropertyName: string | null = null,
+	composableFullfilePath?: string
 ) {
 	if (bt.isObjectExpression(propsValuePath.node)) {
 		const objProp = propsValuePath.get('properties')
@@ -85,8 +86,27 @@ export async function describePropsFromValue(
 
 				// If spread properties like on the vue 3, parse and recursive
 				if (bt.isSpreadElement(propNode)) {
-					const propsValuePath = await getSpreadProperties(propNode, opt, documentation)
-					await describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName)
+					const spreadElementName =
+						// @ts-ignore
+						propNode.argument.type === 'CallExpression'
+							? propNode.argument.callee.name
+							: propNode.argument.name
+
+					const { propsValuePath, composableFilePath } = await parseSpreadProperties(
+						spreadElementName,
+						composableFullfilePath || documentation.componentFullfilePath,
+						opt
+					)
+
+					// const propsValuePath = await getSpreadProperties(propNode, opt, documentation)
+					await describePropsFromValue(
+						documentation,
+						propsValuePath as any,
+						ast,
+						opt,
+						modelPropertyName,
+						composableFilePath
+					)
 				}
 
 				// description

@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
+var bt = __importStar(require("@babel/types"));
 /**
  * true if the left part of the expression of the NodePath is of form `exports.foo = ...;` or
  * `modules.exports = ...;`.
@@ -35,16 +35,16 @@ function isExportedAssignment(path) {
     if (!bt.isAssignmentExpression(path.node)) {
         return false;
     }
-    const pathLeft = path.get('left');
-    const isSimpleExports = bt.isIdentifier(pathLeft.node) && pathLeft.node.name === 'exports';
+    var pathLeft = path.get('left');
+    var isSimpleExports = bt.isIdentifier(pathLeft.node) && pathLeft.node.name === 'exports';
     // check if we are looking at obj.member = value`
-    let isModuleExports = false;
+    var isModuleExports = false;
     if (!isSimpleExports && !bt.isMemberExpression(pathLeft.node)) {
         return false;
     }
     else if (bt.isMemberExpression(pathLeft.node)) {
-        const leftObject = pathLeft.get('object');
-        const leftProp = pathLeft.get('property');
+        var leftObject = pathLeft.get('object');
+        var leftProp = pathLeft.get('property');
         isModuleExports =
             !Array.isArray(leftProp) &&
                 bt.isIdentifier(leftProp.node) &&

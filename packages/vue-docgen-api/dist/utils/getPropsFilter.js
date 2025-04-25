@@ -23,12 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
+var bt = __importStar(require("@babel/types"));
 function getMemberFilter(propName) {
-    return p => bt.isIdentifier(p.node.key)
-        ? p.node.key.name === propName
-        : bt.isStringLiteral(p.node.key)
-            ? p.node.key.value === propName
-            : false;
+    return function (p) {
+        return bt.isIdentifier(p.node.key)
+            ? p.node.key.name === propName
+            : bt.isStringLiteral(p.node.key)
+                ? p.node.key.value === propName
+                : false;
+    };
 }
 exports.default = getMemberFilter;

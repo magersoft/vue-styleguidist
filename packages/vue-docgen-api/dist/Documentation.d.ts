@@ -1,5 +1,5 @@
-import { Descriptor, PropDescriptor, MethodDescriptor, SlotDescriptor, EventDescriptor, ExposedDescriptor, ComponentDoc, DocBlockTags, BlockTag, Param, UnnamedParam, Tag, ParamTag, ParamType } from 'vue-inbrowser-compiler-independent-utils';
-export { Descriptor, PropDescriptor, MethodDescriptor, SlotDescriptor, EventDescriptor, ExposedDescriptor, ComponentDoc, DocBlockTags, BlockTag, Param, UnnamedParam, Tag, ParamTag, ParamType };
+import { Descriptor, PropDescriptor, MethodDescriptor, SlotDescriptor, EventDescriptor, ExposeDescriptor, ComponentDoc, DocBlockTags, BlockTag, Param, UnnamedParam, Tag, ParamTag, ParamType } from 'vue-inbrowser-compiler-independent-utils';
+export { Descriptor, PropDescriptor, MethodDescriptor, SlotDescriptor, EventDescriptor, ExposeDescriptor, ComponentDoc, DocBlockTags, BlockTag, Param, UnnamedParam, Tag, ParamTag, ParamType };
 export default class Documentation {
     private propsMap;
     private eventsMap;
@@ -9,6 +9,7 @@ export default class Documentation {
     private dataMap;
     private docsBlocks;
     private originExtendsMixin;
+    readonly sourceFiles: Set<string>;
     readonly componentFullfilePath: string;
     constructor(fullFilePath: string);
     setOrigin(origin: Descriptor): void;
@@ -19,7 +20,7 @@ export default class Documentation {
     getEventDescriptor(eventName: string): EventDescriptor;
     getSlotDescriptor(slotName: string): SlotDescriptor;
     getMethodDescriptor(methodName: string): MethodDescriptor;
-    getExposedDescriptor(exposedName: string): ExposedDescriptor;
+    getExposeDescriptor(exposedName: string): ExposeDescriptor;
     toObject(): ComponentDoc;
     private getDescriptor;
     private getObjectFromDescriptor;

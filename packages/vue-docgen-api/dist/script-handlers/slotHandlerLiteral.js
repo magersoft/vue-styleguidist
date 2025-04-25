@@ -26,10 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
+var bt = __importStar(require("@babel/types"));
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
+var getDocblock_1 = __importDefault(require("../utils/getDocblock"));
 /**
  * Extract slots information from the render or setup function of an object-style VueJs component
  * @param documentation
@@ -37,27 +37,27 @@ const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
  */
 function slotHandler(documentation, path) {
     if (bt.isObjectExpression(path.node)) {
-        const renderPath = (0, getProperties_1.default)(path, 'render');
-        const setupPath = (0, getProperties_1.default)(path, 'setup');
+        var renderPath = (0, getProperties_1.default)(path, 'render');
+        var setupPath = (0, getProperties_1.default)(path, 'setup');
         if (!renderPath.length && !setupPath.length) {
             return Promise.resolve();
         }
-        const functionPath = renderPath.length ? renderPath : setupPath;
-        let i = 0;
-        let docBlock = (0, getDocblock_1.default)(functionPath[0], { commentIndex: i });
+        var functionPath = renderPath.length ? renderPath : setupPath;
+        var i = 0;
+        var docBlock = (0, getDocblock_1.default)(functionPath[0], { commentIndex: i });
         while (docBlock) {
             // if no doc block return
             if (!docBlock || !docBlock.length) {
                 return Promise.resolve();
             }
-            const jsDoc = (0, getDoclets_1.default)(docBlock);
+            var jsDoc = (0, getDoclets_1.default)(docBlock);
             if (jsDoc.tags) {
-                const slotTag = jsDoc.tags.find(a => a.title === 'slot');
+                var slotTag = jsDoc.tags.find(function (a) { return a.title === 'slot'; });
                 if (slotTag) {
-                    const name = typeof slotTag.content === 'string' ? slotTag.content : 'default';
-                    const slotDescriptor = documentation.getSlotDescriptor(name);
+                    var name_1 = typeof slotTag.content === 'string' ? slotTag.content : 'default';
+                    var slotDescriptor = documentation.getSlotDescriptor(name_1);
                     slotDescriptor.description = jsDoc.description;
-                    const bindingsTag = jsDoc.tags.filter(t => t.title === 'binding');
+                    var bindingsTag = jsDoc.tags.filter(function (t) { return t.title === 'binding'; });
                     if (bindingsTag) {
                         slotDescriptor.bindings = bindingsTag;
                     }

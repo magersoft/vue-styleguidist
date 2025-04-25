@@ -26,27 +26,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const ts_map_1 = __importDefault(require("ts-map"));
+var bt = __importStar(require("@babel/types"));
+var ts_map_1 = __importDefault(require("ts-map"));
 function resolveExportDeclaration(path) {
-    const definitions = new ts_map_1.default();
+    var definitions = new ts_map_1.default();
     if (bt.isExportDefaultDeclaration(path.node)) {
-        const defaultPath = path;
+        var defaultPath = path;
         definitions.set('default', defaultPath.get('declaration'));
     }
     else if (bt.isExportNamedDeclaration(path.node)) {
-        const declaration = path.get('declaration');
+        var declaration = path.get('declaration');
         // export const example = {}
         if (declaration && bt.isVariableDeclaration(declaration.node)) {
-            declaration.get('declarations').each((declarator) => {
-                const nodeId = declarator.node.id;
+            declaration.get('declarations').each(function (declarator) {
+                var nodeId = declarator.node.id;
                 if (bt.isIdentifier(nodeId)) {
                     definitions.set(nodeId.name, declarator);
                 }
             });
         }
         else if (declaration && bt.isClassDeclaration(declaration.node)) {
-            const nodeId = declaration.node.id;
+            var nodeId = declaration.node.id;
             if (bt.isIdentifier(nodeId)) {
                 definitions.set(nodeId.name, declaration);
             }
@@ -64,8 +64,8 @@ function resolveExportDeclaration(path) {
 }
 exports.default = resolveExportDeclaration;
 function getDefinitionsFromPathSpecifiers(path, defs) {
-    const specifiersPath = path.get('specifiers');
-    specifiersPath.each((specifier) => {
+    var specifiersPath = path.get('specifiers');
+    specifiersPath.each(function (specifier) {
         if (bt.isIdentifier(specifier.node.exported)) {
             defs.set(specifier.node.exported.name, bt.isExportSpecifier(specifier.node) ? specifier.get('local') : specifier.get('exported'));
         }

@@ -26,12 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const eventHandler_1 = require("./eventHandler");
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const resolveIdentifier_1 = __importDefault(require("../utils/resolveIdentifier"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var eventHandler_1 = require("./eventHandler");
+var getDocblock_1 = __importDefault(require("../utils/getDocblock"));
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var resolveIdentifier_1 = __importDefault(require("../utils/resolveIdentifier"));
 /**
  * Extracts all events from a class-style component code
  * @param documentation
@@ -41,23 +41,23 @@ const resolveIdentifier_1 = __importDefault(require("../utils/resolveIdentifier"
 function classEventHandler(documentation, path, astPath) {
     if (bt.isClassDeclaration(path.node)) {
         (0, recast_1.visit)(path.node, {
-            visitClassMethod(nodePath) {
+            visitClassMethod: function (nodePath) {
                 if (nodePath.node.decorators &&
-                    bt.isCallExpression(nodePath.node.decorators[0].expression) &&
-                    bt.isIdentifier(nodePath.node.decorators[0].expression.callee) &&
+                    nodePath.node.decorators[0].expression.type === 'CallExpression' &&
+                    nodePath.node.decorators[0].expression.callee.type === 'Identifier' &&
                     nodePath.node.decorators[0].expression.callee.name === 'Emit') {
                     // fetch the leading comments on the wrapping expression
-                    const docblock = (0, getDocblock_1.default)(nodePath);
-                    const doclets = (0, getDoclets_1.default)(docblock || '');
-                    let eventName;
-                    const eventTags = doclets.tags ? doclets.tags.filter(d => d.title === 'event') : [];
-                    const exp = nodePath.get('decorators', 0).get('expression');
+                    var docblock = (0, getDocblock_1.default)(nodePath);
+                    var doclets = (0, getDoclets_1.default)(docblock || '');
+                    var eventName = void 0;
+                    var eventTags = doclets.tags ? doclets.tags.filter(function (d) { return d.title === 'event'; }) : [];
+                    var exp = nodePath.get('decorators', 0).get('expression');
                     // if someone wants to document it with anything else, they can force it
                     if (eventTags.length) {
                         eventName = eventTags[0].content;
                     }
                     else if (exp.get('arguments').value.length) {
-                        let firstArg = exp.get('arguments', 0);
+                        var firstArg = exp.get('arguments', 0);
                         if (bt.isIdentifier(firstArg.node)) {
                             firstArg = (0, resolveIdentifier_1.default)(astPath, firstArg);
                         }
@@ -66,13 +66,13 @@ function classEventHandler(documentation, path, astPath) {
                         }
                         eventName = firstArg.node.value;
                     }
-                    else if (bt.isIdentifier(nodePath.node.key)) {
+                    else if (nodePath.node.key.type === 'Identifier') {
                         eventName = nodePath.node.key.name;
                     }
                     else {
                         return false;
                     }
-                    const evtDescriptor = documentation.getEventDescriptor(eventName);
+                    var evtDescriptor = documentation.getEventDescriptor(eventName);
                     (0, eventHandler_1.setEventDescriptor)(evtDescriptor, doclets);
                     return false;
                 }

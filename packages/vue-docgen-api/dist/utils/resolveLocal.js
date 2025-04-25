@@ -26,14 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const ts_map_1 = __importDefault(require("ts-map"));
-const recast_1 = require("recast");
+var bt = __importStar(require("@babel/types"));
+var ts_map_1 = __importDefault(require("ts-map"));
+var recast_1 = require("recast");
 function ignore() {
     return false;
 }
 function resolveLocal(ast, variableNames) {
-    const variablesMap = new ts_map_1.default();
+    var variablesMap = new ts_map_1.default();
     (0, recast_1.visit)(ast, {
         // for perf resons,
         // look only at the root,
@@ -48,10 +48,10 @@ function resolveLocal(ast, variableNames) {
         visitDoWhileStatement: ignore,
         visitForStatement: ignore,
         visitForInStatement: ignore,
-        visitVariableDeclaration(pathVariable) {
-            pathVariable.get('declarations').each((declaration) => {
+        visitVariableDeclaration: function (pathVariable) {
+            pathVariable.get('declarations').each(function (declaration) {
                 if (bt.isVariableDeclarator(declaration.node) && bt.isIdentifier(declaration.node.id)) {
-                    const varName = declaration.node.id.name;
+                    var varName = declaration.node.id.name;
                     if (variableNames.includes(varName) && declaration.get('init', 'callee', 'name').value !== 'require') {
                         variablesMap.set(varName, declaration.get('init'));
                     }

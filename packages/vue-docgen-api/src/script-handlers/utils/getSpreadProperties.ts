@@ -8,7 +8,7 @@ import { readFile } from 'fs'
 import { NodePath } from 'ast-types/lib/node-path'
 import resolveExportedComponent from '../../utils/resolveExportedComponent'
 import Documentation from '../../Documentation'
-import { ParseOptions } from '../../parse'
+import { ParseOptions } from '../../types'
 import cacher from '../../utils/cacher'
 import buildParser from '../../babel-parser'
 
@@ -22,6 +22,7 @@ export default async function getSpreadProperties(
 	const spreadElementName =
 		// @ts-ignore
 		node.argument.type === 'CallExpression' ? node.argument.callee.name : node.argument.name
+
 	const source = await read(documentation.componentFullfilePath, { encoding: 'utf-8' })
 	const spreadImportPaths = getFromPathsInFileByImportsOrExports(source, spreadElementName)
 	const composableDirPath = getFullPathToComposableDir(documentation, spreadImportPaths)

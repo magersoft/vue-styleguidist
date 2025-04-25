@@ -26,9 +26,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const getArgFromDecorator_1 = __importDefault(require("../utils/getArgFromDecorator"));
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
+var bt = __importStar(require("@babel/types"));
+var getArgFromDecorator_1 = __importDefault(require("../utils/getArgFromDecorator"));
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
 /**
  * Extracts the name of the component from a class-style component
  * @param documentation
@@ -36,21 +36,21 @@ const getProperties_1 = __importDefault(require("./utils/getProperties"));
  */
 function classDisplayNameHandler(documentation, path) {
     if (bt.isClassDeclaration(path.node)) {
-        const config = (0, getArgFromDecorator_1.default)(path.get('decorators'));
-        let displayName;
+        var config = (0, getArgFromDecorator_1.default)(path.get('decorators'));
+        var displayName_1;
         if (config && bt.isObjectExpression(config.node)) {
-            (0, getProperties_1.default)(config, 'name').forEach((p) => {
-                const valuePath = p.get('value');
+            (0, getProperties_1.default)(config, 'name').forEach(function (p) {
+                var valuePath = p.get('value');
                 if (bt.isStringLiteral(valuePath.node)) {
-                    displayName = valuePath.node.value;
+                    displayName_1 = valuePath.node.value;
                 }
             });
         }
         else {
-            displayName = path.node.id ? path.node.id.name : undefined;
+            displayName_1 = path.node.id ? path.node.id.name : undefined;
         }
-        if (displayName) {
-            documentation.set('displayName', displayName);
+        if (displayName_1) {
+            documentation.set('displayName', displayName_1);
         }
     }
     return Promise.resolve();

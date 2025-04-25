@@ -26,11 +26,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
-const getProperties_1 = __importDefault(require("./utils/getProperties"));
+var bt = __importStar(require("@babel/types"));
+var getProperties_1 = __importDefault(require("./utils/getProperties"));
+var handleComponentJSDoc_1 = __importDefault(require("../utils/handleComponentJSDoc"));
 /**
  * Extracts prop information from an object-style VueJs component
  * @param documentation
@@ -39,19 +37,19 @@ const getProperties_1 = __importDefault(require("./utils/getProperties"));
 function componentHandler(documentation, path) {
     // deal with functional flag
     if (bt.isObjectExpression(path.node)) {
-        const functionalPath = (0, getProperties_1.default)(path, 'functional');
+        var functionalPath = (0, getProperties_1.default)(path, 'functional');
         if (functionalPath.length) {
-            const functionalValue = functionalPath[0].get('value').node;
+            var functionalValue = functionalPath[0].get('value').node;
             if (bt.isBooleanLiteral(functionalValue)) {
                 documentation.set('functional', functionalValue.value);
             }
         }
     }
-    let componentCommentedPath = path.parentPath;
+    var componentCommentedPath = path.parentPath;
     // in case of Vue.extend() structure
     if (bt.isCallExpression(componentCommentedPath.node)) {
         // look for leading comments in the parent structures
-        let i = 5;
+        var i = 5;
         while (i-- &&
             !componentCommentedPath.get('leadingComments').value &&
             componentCommentedPath.parentPath.node.type !== 'Program') {
@@ -65,34 +63,12 @@ function componentHandler(documentation, path) {
         }
     }
     else if (bt.isDeclaration(componentCommentedPath.node)) {
-        const classDeclaration = componentCommentedPath.get('declaration');
+        var classDeclaration = componentCommentedPath.get('declaration');
         if (bt.isClassDeclaration(classDeclaration.node)) {
             componentCommentedPath = classDeclaration;
         }
     }
-    const docBlock = (0, getDocblock_1.default)(componentCommentedPath);
-    // if no prop return
-    if (!docBlock || !docBlock.length) {
-        return Promise.resolve();
-    }
-    const jsDoc = (0, getDoclets_1.default)(docBlock);
-    documentation.set('description', jsDoc.description);
-    if (jsDoc.tags) {
-        const displayNamesTags = jsDoc.tags.filter(t => t.title === 'displayName');
-        if (displayNamesTags.length) {
-            const displayName = displayNamesTags[0];
-            documentation.set('displayName', displayName.content);
-        }
-        const tagsAsObject = (0, transformTagsIntoObject_1.default)(jsDoc.tags.filter(t => t.title !== 'example' && t.title !== 'displayName') || []);
-        const examples = jsDoc.tags.filter(t => t.title === 'example');
-        if (examples.length) {
-            tagsAsObject.examples = examples;
-        }
-        documentation.set('tags', tagsAsObject);
-    }
-    else {
-        documentation.set('tags', {});
-    }
-    return Promise.resolve();
+    // always return a promise to trigger next handler in chain
+    return (0, handleComponentJSDoc_1.default)(componentCommentedPath, documentation);
 }
 exports.default = componentHandler;

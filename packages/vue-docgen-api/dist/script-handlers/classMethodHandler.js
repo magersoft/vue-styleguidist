@@ -26,10 +26,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const methodHandler_1 = require("./methodHandler");
+var bt = __importStar(require("@babel/types"));
+var getDocblock_1 = __importDefault(require("../utils/getDocblock"));
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var methodHandler_1 = require("./methodHandler");
 /**
  * Extracts all information about methods in a class-style Component
  * @param documentation
@@ -37,23 +37,23 @@ const methodHandler_1 = require("./methodHandler");
  */
 function classMethodHandler(documentation, path) {
     if (bt.isClassDeclaration(path.node)) {
-        const methods = documentation.get('methods') || [];
-        const allMethods = path
+        var methods = documentation.get('methods') || [];
+        var allMethods = path
             .get('body')
             .get('body')
-            .filter((a) => bt.isClassMethod(a.node));
-        allMethods.forEach((methodPath) => {
-            const methodName = bt.isIdentifier(methodPath.node.key)
+            .filter(function (a) { return bt.isClassMethod(a.node); });
+        allMethods.forEach(function (methodPath) {
+            var methodName = bt.isIdentifier(methodPath.node.key)
                 ? methodPath.node.key.name
                 : '<anonymous>';
-            const docBlock = (0, getDocblock_1.default)(bt.isClassMethod(methodPath.node) ? methodPath : methodPath.parentPath);
-            const jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
-            const jsDocTags = jsDoc.tags ? jsDoc.tags : [];
+            var docBlock = (0, getDocblock_1.default)(bt.isClassMethod(methodPath.node) ? methodPath : methodPath.parentPath);
+            var jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
+            var jsDocTags = jsDoc.tags ? jsDoc.tags : [];
             // ignore the method if there is no public tag
-            if (!jsDocTags.some((t) => t.title === 'access' && t.content === 'public')) {
+            if (!jsDocTags.some(function (t) { return t.title === 'access' && t.content === 'public'; })) {
                 return Promise.resolve();
             }
-            const methodDescriptor = documentation.getMethodDescriptor(methodName);
+            var methodDescriptor = documentation.getMethodDescriptor(methodName);
             if (jsDoc.description) {
                 methodDescriptor.description = jsDoc.description;
             }

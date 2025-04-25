@@ -23,12 +23,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bt = __importStar(require("@babel/types"));
+var bt = __importStar(require("@babel/types"));
 function getArgFromDecorator(path) {
-    const expForDecorator = path
-        .filter((p) => {
-        const exp = p.get('expression');
-        const decoratorIdenifier = bt.isCallExpression(exp.node) ? exp.node.callee : exp.node;
+    var expForDecorator = path
+        .filter(function (p) {
+        var exp = p.get('expression');
+        var decoratorIdenifier = bt.isCallExpression(exp.node) ? exp.node.callee : exp.node;
         return (bt.isIdentifier(decoratorIdenifier) ? decoratorIdenifier.name : null) === 'Component';
     }, null)[0]
         .get('expression');

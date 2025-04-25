@@ -31,28 +31,80 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractValuesFromTags = exports.describeDefault = exports.describeRequired = exports.getValuesFromTypeAnnotation = exports.getTypeFromTypePath = exports.describeType = exports.describePropsFromValue = exports.getRawValueParsedFromFunctionsBlockStatementNode = void 0;
-const bt = __importStar(require("@babel/types"));
-const recast_1 = require("recast");
-const getDocblock_1 = __importDefault(require("../utils/getDocblock"));
-const getDoclets_1 = __importDefault(require("../utils/getDoclets"));
-const transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
-const getPropsFilter_1 = __importDefault(require("../utils/getPropsFilter"));
-const getTemplateExpressionAST_1 = __importDefault(require("../utils/getTemplateExpressionAST"));
-const parseValidator_1 = __importDefault(require("./utils/parseValidator"));
-const getSpreadProperties_1 = __importDefault(require("./utils/getSpreadProperties"));
+var bt = __importStar(require("@babel/types"));
+var recast_1 = require("recast");
+var getDocblock_1 = __importDefault(require("../utils/getDocblock"));
+var getDoclets_1 = __importDefault(require("../utils/getDoclets"));
+var transformTagsIntoObject_1 = __importDefault(require("../utils/transformTagsIntoObject"));
+var getPropsFilter_1 = __importDefault(require("../utils/getPropsFilter"));
+var getTemplateExpressionAST_1 = __importDefault(require("../utils/getTemplateExpressionAST"));
+var parseValidator_1 = __importDefault(require("./utils/parseValidator"));
+var parseSpreadProperties_1 = __importDefault(require("./utils/parseSpreadProperties"));
 function getRawValueParsedFromFunctionsBlockStatementNode(blockStatementNode) {
-    const { body } = blockStatementNode;
+    var body = blockStatementNode.body;
     // if there is more than a return statement in the body,
     // we cannot resolve the new object, we let the function display as a function
     if (body.length !== 1 || !bt.isReturnStatement(body[0])) {
         return null;
     }
-    const [ret] = body;
+    var _a = __read(body, 1), ret = _a[0];
     return ret.argument ? (0, recast_1.print)(ret.argument).code : null;
 }
 exports.getRawValueParsedFromFunctionsBlockStatementNode = getRawValueParsedFromFunctionsBlockStatementNode;
@@ -62,113 +114,155 @@ exports.getRawValueParsedFromFunctionsBlockStatementNode = getRawValueParsedFrom
  * @param path
  */
 function propHandler(documentation, path, ast, opt) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (bt.isObjectExpression(path.node)) {
-            const propsPath = path
-                .get('properties')
-                .filter((p) => bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('props')(p));
-            // if no prop return
-            if (!propsPath.length) {
-                return Promise.resolve();
+    return __awaiter(this, void 0, void 0, function () {
+        var propsPath, modelPropertyName, propsValuePath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!bt.isObjectExpression(path.node)) return [3 /*break*/, 2];
+                    propsPath = path
+                        .get('properties')
+                        .filter(function (p) { return bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('props')(p); });
+                    // if no prop return
+                    if (!propsPath.length) {
+                        return [2 /*return*/, Promise.resolve()];
+                    }
+                    modelPropertyName = getModelPropName(path);
+                    propsValuePath = propsPath[0].get('value');
+                    return [4 /*yield*/, describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName)];
+                case 1:
+                    _a.sent();
+                    _a.label = 2;
+                case 2: return [2 /*return*/];
             }
-            const modelPropertyName = getModelPropName(path);
-            const propsValuePath = propsPath[0].get('value');
-            yield describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName);
-        }
+        });
     });
 }
 exports.default = propHandler;
-function describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName = null) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (bt.isObjectExpression(propsValuePath.node)) {
-            const objProp = propsValuePath.get('properties');
-            // filter non object properties
-            const objPropFiltered = objProp.filter((p) => bt.isProperty(p.node) || bt.isSpreadElement(p.node));
-            yield Promise.all(objPropFiltered.map((prop) => __awaiter(this, void 0, void 0, function* () {
-                const propNode = prop.node;
-                // If spread properties like on the vue 3, parse and recursive
-                if (bt.isSpreadElement(propNode)) {
-                    const propsValuePath = yield (0, getSpreadProperties_1.default)(propNode, opt, documentation);
-                    yield describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName);
-                }
-                // description
-                const docBlock = (0, getDocblock_1.default)(prop);
-                const jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
-                const jsDocTags = jsDoc.tags ? jsDoc.tags : [];
-                // if it's the v-model describe it only as such
-                const propertyName = bt.isIdentifier(propNode.key)
-                    ? propNode.key.name
-                    : bt.isStringLiteral(propNode.key)
-                        ? propNode.key.value
-                        : null;
-                if (!propertyName) {
-                    return;
-                }
-                const isPropertyModel = jsDocTags.some(t => t.title === 'model') || propertyName === modelPropertyName;
-                const propName = isPropertyModel ? 'v-model' : propertyName;
-                const propDescriptor = documentation.getPropDescriptor(propName);
-                const propValuePath = prop.get('value');
-                if (jsDoc.description) {
-                    propDescriptor.description = jsDoc.description;
-                }
-                if (jsDocTags.length) {
-                    propDescriptor.tags = (0, transformTagsIntoObject_1.default)(jsDocTags);
-                }
-                extractValuesFromTags(propDescriptor);
-                if (bt.isArrayExpression(propValuePath.node) || bt.isIdentifier(propValuePath.node)) {
-                    // if it's an immediately typed property, resolve its type immediately
-                    propDescriptor.type = getTypeFromTypePath(propValuePath);
-                }
-                else if (bt.isObjectExpression(propValuePath.node)) {
-                    // standard default + type + required
-                    const propPropertiesPath = propValuePath
-                        .get('properties')
-                        .filter((p) => bt.isObjectProperty(p.node) || bt.isObjectMethod(p.node));
-                    // type
-                    const literalType = describeType(propPropertiesPath, propDescriptor);
-                    // required
-                    describeRequired(propPropertiesPath, propDescriptor);
-                    // default
-                    describeDefault(propPropertiesPath, propDescriptor, literalType || '');
-                    // validator => values
-                    yield describeValues(propPropertiesPath, propDescriptor, ast, opt);
-                }
-                else if (bt.isTSAsExpression(propValuePath.node)) {
-                    const propValuePathExpression = propValuePath.get('expression');
-                    if (bt.isObjectExpression(propValuePathExpression.node)) {
-                        // standard default + type + required with TS as annotation
-                        const propPropertiesPath = propValuePathExpression
-                            .get('properties')
-                            .filter((p) => bt.isObjectProperty(p.node));
-                        // type and values
-                        describeTypeAndValuesFromPath(propValuePath, propDescriptor);
-                        // required
-                        describeRequired(propPropertiesPath, propDescriptor);
-                        // default
-                        describeDefault(propPropertiesPath, propDescriptor, (propDescriptor.type && propDescriptor.type.name) || '');
+function describePropsFromValue(documentation, propsValuePath, ast, opt, modelPropertyName, composableFullfilePath) {
+    if (modelPropertyName === void 0) { modelPropertyName = null; }
+    return __awaiter(this, void 0, void 0, function () {
+        var objProp, objPropFiltered;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!bt.isObjectExpression(propsValuePath.node)) return [3 /*break*/, 2];
+                    objProp = propsValuePath.get('properties');
+                    objPropFiltered = objProp.filter(function (p) { return bt.isProperty(p.node) || bt.isSpreadElement(p.node); });
+                    return [4 /*yield*/, Promise.all(objPropFiltered.map(function (prop) { return __awaiter(_this, void 0, void 0, function () {
+                            var propNode, spreadElementName, _a, propsValuePath_1, composableFilePath, docBlock, jsDoc, jsDocTags, propertyName, isPropertyModel, propName, propDescriptor, propValuePath, propPropertiesPath, literalType, propValuePathExpression, finalPropValuePathExpression, propPropertiesPath;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        propNode = prop.node;
+                                        if (!bt.isSpreadElement(propNode)) return [3 /*break*/, 3];
+                                        spreadElementName = 
+                                        // @ts-ignore
+                                        propNode.argument.type === 'CallExpression' ? propNode.argument.callee.name : propNode.argument.name;
+                                        return [4 /*yield*/, (0, parseSpreadProperties_1.default)(spreadElementName, composableFullfilePath || documentation.componentFullfilePath, opt)];
+                                    case 1:
+                                        _a = _b.sent(), propsValuePath_1 = _a.propsValuePath, composableFilePath = _a.composableFilePath;
+                                        // const propsValuePath = await getSpreadProperties(propNode, opt, documentation)
+                                        return [4 /*yield*/, describePropsFromValue(documentation, propsValuePath_1, ast, opt, modelPropertyName, composableFilePath)];
+                                    case 2:
+                                        // const propsValuePath = await getSpreadProperties(propNode, opt, documentation)
+                                        _b.sent();
+                                        _b.label = 3;
+                                    case 3:
+                                        docBlock = (0, getDocblock_1.default)(prop);
+                                        jsDoc = docBlock ? (0, getDoclets_1.default)(docBlock) : { description: '', tags: [] };
+                                        jsDocTags = jsDoc.tags ? jsDoc.tags : [];
+                                        propertyName = bt.isIdentifier(propNode.key)
+                                            ? propNode.key.name
+                                            : bt.isStringLiteral(propNode.key)
+                                                ? propNode.key.value
+                                                : null;
+                                        if (!propertyName) {
+                                            return [2 /*return*/];
+                                        }
+                                        isPropertyModel = jsDocTags.some(function (t) { return t.title === 'model'; }) || propertyName === modelPropertyName;
+                                        propName = isPropertyModel ? 'v-model' : propertyName;
+                                        propDescriptor = documentation.getPropDescriptor(propName);
+                                        propValuePath = prop.get('value');
+                                        if (jsDoc.description) {
+                                            propDescriptor.description = jsDoc.description;
+                                        }
+                                        if (jsDocTags.length) {
+                                            propDescriptor.tags = (0, transformTagsIntoObject_1.default)(jsDocTags);
+                                        }
+                                        extractValuesFromTags(propDescriptor);
+                                        if (!(bt.isArrayExpression(propValuePath.node) || bt.isIdentifier(propValuePath.node))) return [3 /*break*/, 4];
+                                        // if it's an immediately typed property, resolve its type immediately
+                                        propDescriptor.type = getTypeFromTypePath(propValuePath);
+                                        return [3 /*break*/, 7];
+                                    case 4:
+                                        if (!bt.isObjectExpression(propValuePath.node)) return [3 /*break*/, 6];
+                                        propPropertiesPath = propValuePath
+                                            .get('properties')
+                                            .filter(function (p) { return bt.isObjectProperty(p.node) || bt.isObjectMethod(p.node); });
+                                        literalType = describeType(propPropertiesPath, propDescriptor);
+                                        // required
+                                        describeRequired(propPropertiesPath, propDescriptor);
+                                        // default
+                                        describeDefault(propPropertiesPath, propDescriptor, literalType || '');
+                                        // validator => values
+                                        return [4 /*yield*/, describeValues(propPropertiesPath, propDescriptor, ast, opt)];
+                                    case 5:
+                                        // validator => values
+                                        _b.sent();
+                                        return [3 /*break*/, 7];
+                                    case 6:
+                                        if (bt.isTSAsExpression(propValuePath.node)) {
+                                            propValuePathExpression = propValuePath.get('expression');
+                                            finalPropValuePathExpression = bt.isTSAsExpression(propValuePathExpression.node) &&
+                                                bt.isTSUnknownKeyword(propValuePathExpression.get('typeAnnotation').node)
+                                                ? propValuePathExpression.get('expression')
+                                                : propValuePathExpression;
+                                            if (bt.isObjectExpression(finalPropValuePathExpression.node)) {
+                                                propPropertiesPath = finalPropValuePathExpression
+                                                    .get('properties')
+                                                    .filter(function (p) { return bt.isObjectProperty(p.node); });
+                                                // type and values
+                                                describeTypeAndValuesFromPath(propValuePath, propDescriptor);
+                                                // required
+                                                describeRequired(propPropertiesPath, propDescriptor);
+                                                // default
+                                                describeDefault(propPropertiesPath, propDescriptor, (propDescriptor.type && propDescriptor.type.name) || '');
+                                            }
+                                            else if (bt.isIdentifier(finalPropValuePathExpression.node)) {
+                                                describeTypeAndValuesFromPath(propValuePath, propDescriptor);
+                                            }
+                                        }
+                                        else {
+                                            // in any other case, just display the code for the typing
+                                            propDescriptor.type = {
+                                                name: (0, recast_1.print)(prop.get('value')).code,
+                                                func: true
+                                            };
+                                        }
+                                        _b.label = 7;
+                                    case 7: return [2 /*return*/];
+                                }
+                            });
+                        }); }))];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    if (bt.isArrayExpression(propsValuePath.node)) {
+                        propsValuePath
+                            .get('elements')
+                            .filter(function (e) { return bt.isStringLiteral(e.node); })
+                            .forEach(function (e) {
+                            var propDescriptor = documentation.getPropDescriptor(e.node.value);
+                            propDescriptor.type = { name: 'undefined' };
+                        });
                     }
-                    else if (bt.isIdentifier(propValuePathExpression.node)) {
-                        describeTypeAndValuesFromPath(propValuePath, propDescriptor);
-                    }
-                }
-                else {
-                    // in any other case, just display the code for the typing
-                    propDescriptor.type = {
-                        name: (0, recast_1.print)(prop.get('value')).code,
-                        func: true
-                    };
-                }
-            })));
-        }
-        else if (bt.isArrayExpression(propsValuePath.node)) {
-            propsValuePath
-                .get('elements')
-                .filter((e) => bt.isStringLiteral(e.node))
-                .forEach((e) => {
-                const propDescriptor = documentation.getPropDescriptor(e.node.value);
-                propDescriptor.type = { name: 'undefined' };
-            });
-        }
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
+            }
+        });
     });
 }
 exports.describePropsFromValue = describePropsFromValue;
@@ -179,32 +273,38 @@ exports.describePropsFromValue = describePropsFromValue;
  * @returns the unaltered type member of the prop object
  */
 function describeType(propPropertiesPath, propDescriptor) {
-    const typeArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('type'));
+    var typeArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('type'));
     if (propDescriptor.tags && propDescriptor.tags.type) {
-        const [{ type: typeDesc }] = propDescriptor.tags.type;
+        var _a = __read(propDescriptor.tags.type, 1), typeDesc = _a[0].type;
         if (typeDesc) {
-            const typedAST = (0, getTemplateExpressionAST_1.default)(`let a:${typeDesc.name}`);
-            let typeValues;
+            var typedAST = (0, getTemplateExpressionAST_1.default)("let a:".concat(typeDesc.name));
+            var typeValues_1;
             (0, recast_1.visit)(typedAST.program, {
-                visitVariableDeclaration(path) {
-                    const { typeAnnotation } = path.get('declarations', 0, 'id', 'typeAnnotation').value;
+                visitVariableDeclaration: function (path) {
+                    var typeAnnotation = path.get('declarations', 0, 'id', 'typeAnnotation').value.typeAnnotation;
                     if (bt.isTSUnionType(typeAnnotation) &&
-                        typeAnnotation.types.every(t => bt.isTSLiteralType(t))) {
-                        typeValues = typeAnnotation.types.map((t) => 
-                        // @ts-ignore
-                        bt.isUnaryExpression(t.literal)
-                            ? t.literal.argument.toString()
-                            : t.literal.value.toString());
+                        typeAnnotation.types.every(function (t) { return bt.isTSLiteralType(t); })) {
+                        typeValues_1 = typeAnnotation.types.map(function (t) {
+                            return 'literal' in t
+                                ? bt.isUnaryExpression(t.literal)
+                                    ? t.literal.argument.toString()
+                                    : bt.isTemplateLiteral(t.literal)
+                                        ? t.literal.type
+                                        : t.literal.value.toString()
+                                : t.type.toString();
+                        });
                     }
                     return false;
                 }
             });
-            if (typeValues) {
-                propDescriptor.values = typeValues;
+            if (typeValues_1) {
+                propDescriptor.values = typeValues_1;
             }
             else {
                 propDescriptor.type = typeDesc;
-                return getTypeFromTypePath(typeArray[0].get('value')).name;
+                if (typeArray.length) {
+                    return getTypeFromTypePath(typeArray[0].get('value')).name;
+                }
             }
         }
     }
@@ -213,13 +313,13 @@ function describeType(propPropertiesPath, propDescriptor) {
     }
     else {
         // deduce the type from default expression
-        const defaultArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('default'));
+        var defaultArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('default'));
         if (defaultArray.length) {
-            const typeNode = defaultArray[0].node;
+            var typeNode = defaultArray[0].node;
             if (bt.isObjectProperty(typeNode)) {
-                const func = bt.isArrowFunctionExpression(typeNode.value) || bt.isFunctionExpression(typeNode.value);
-                const typeValueNode = defaultArray[0].get('value').node;
-                const typeName = typeof typeValueNode.value;
+                var func = bt.isArrowFunctionExpression(typeNode.value) || bt.isFunctionExpression(typeNode.value);
+                var typeValueNode = defaultArray[0].get('value').node;
+                var typeName = typeof typeValueNode.value;
                 propDescriptor.type = { name: func ? 'func' : typeName };
             }
         }
@@ -227,7 +327,7 @@ function describeType(propPropertiesPath, propDescriptor) {
     return undefined;
 }
 exports.describeType = describeType;
-const VALID_VUE_TYPES = [
+var VALID_VUE_TYPES = [
     'string',
     'number',
     'boolean',
@@ -238,7 +338,7 @@ const VALID_VUE_TYPES = [
     'symbol'
 ];
 function resolveParenthesis(typeAnnotation) {
-    let finalAnno = typeAnnotation;
+    var finalAnno = typeAnnotation;
     while (bt.isTSParenthesizedType(finalAnno)) {
         finalAnno = finalAnno.typeAnnotation;
     }
@@ -246,7 +346,7 @@ function resolveParenthesis(typeAnnotation) {
 }
 function describeTypeAndValuesFromPath(propPropertiesPath, propDescriptor) {
     // values
-    const values = getValuesFromTypePath(propPropertiesPath.node.typeAnnotation);
+    var values = getValuesFromTypePath(propPropertiesPath.node.typeAnnotation);
     // if it has an "as" annotation defining values
     if (values) {
         propDescriptor.values = values;
@@ -261,20 +361,25 @@ function describeTypeAndValuesFromPath(propPropertiesPath, propDescriptor) {
     return propDescriptor.type.name;
 }
 function getTypeFromTypePath(typePath) {
-    const typeNode = typePath.node;
-    const { typeAnnotation } = typeNode;
-    const typeName = bt.isTSTypeReference(typeAnnotation) && typeAnnotation.typeParameters
-        ? (0, recast_1.print)(resolveParenthesis(typeAnnotation.typeParameters.params[0])).code
-        : bt.isArrayExpression(typeNode)
-            ? typePath
-                .get('elements')
-                .map((t) => getTypeFromTypePath(t).name)
-                .join('|')
-            : typeNode &&
-                bt.isIdentifier(typeNode) &&
-                VALID_VUE_TYPES.indexOf(typeNode.name.toLowerCase()) > -1
-                ? typeNode.name.toLowerCase()
-                : (0, recast_1.print)(typeNode).code;
+    var typeNode = typePath.node;
+    var typeAnnotation = typeNode.typeAnnotation;
+    var typeName = !typeNode
+        ? 'any'
+        : bt.isTSTypeReference(typeAnnotation) && typeAnnotation.typeParameters
+            ? (0, recast_1.print)(resolveParenthesis(typeAnnotation.typeParameters.params[0])).code
+            : bt.isArrayExpression(typeNode)
+                ? typePath
+                    .get('elements')
+                    .map(function (t) { return getTypeFromTypePath(t).name; })
+                    .join('|')
+                : bt.isIdentifier(typeNode) && VALID_VUE_TYPES.indexOf(typeNode.name.toLowerCase()) > -1
+                    ? typeNode.name.toLowerCase()
+                    : bt.isObjectProperty(typeNode) &&
+                        bt.isExpression(typeNode.value) &&
+                        bt.isTSInstantiationExpression(typeNode.value)
+                        ? (0, recast_1.print)(typeNode.value.expression).code +
+                            (typeNode.value.typeParameters ? (0, recast_1.print)(typeNode.value.typeParameters).code : '')
+                        : (0, recast_1.print)(typeNode).code;
     return {
         name: typeName === 'function' ? 'func' : typeName
     };
@@ -288,23 +393,28 @@ exports.getTypeFromTypePath = getTypeFromTypePath;
  */
 function getValuesFromTypePath(typeAnnotation) {
     if (bt.isTSTypeReference(typeAnnotation) && typeAnnotation.typeParameters) {
-        const type = resolveParenthesis(typeAnnotation.typeParameters.params[0]);
+        var type = resolveParenthesis(typeAnnotation.typeParameters.params[0]);
         return getValuesFromTypeAnnotation(type);
     }
     return undefined;
 }
 function getValuesFromTypeAnnotation(type) {
-    if (bt.isTSUnionType(type) && type.types.every(t => bt.isTSLiteralType(t))) {
-        // @ts-ignore
-        return type.types.map(t => bt.isTSLiteralType(t) && !bt.isUnaryExpression(t.literal) ? t.literal.value.toString() : '');
+    if (bt.isTSUnionType(type) && type.types.every(function (t) { return bt.isTSLiteralType(t); })) {
+        return type.types.map(function (t) {
+            return bt.isTSLiteralType(t) && !bt.isUnaryExpression(t.literal)
+                ? bt.isTemplateLiteral(t.literal)
+                    ? t.literal.type
+                    : t.literal.value.toString()
+                : '';
+        });
     }
     return undefined;
 }
 exports.getValuesFromTypeAnnotation = getValuesFromTypeAnnotation;
 function describeRequired(propPropertiesPath, propDescriptor) {
-    const requiredArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('required'));
-    const requiredNode = requiredArray.length ? requiredArray[0].get('value').node : undefined;
-    const required = requiredNode && bt.isBooleanLiteral(requiredNode) ? requiredNode.value : undefined;
+    var requiredArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('required'));
+    var requiredNode = requiredArray.length ? requiredArray[0].get('value').node : undefined;
+    var required = requiredNode && bt.isBooleanLiteral(requiredNode) ? requiredNode.value : undefined;
     if (required !== undefined) {
         propDescriptor.required = required;
     }
@@ -312,23 +422,23 @@ function describeRequired(propPropertiesPath, propDescriptor) {
 exports.describeRequired = describeRequired;
 function describeDefault(propPropertiesPath, propDescriptor, propType) {
     var _a;
-    const defaultArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('default'));
+    var defaultArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('default'));
     if (defaultArray.length) {
         /**
          * This means the default value is formatted like so: `default: any`
          */
-        const defaultValueIsProp = bt.isObjectProperty(defaultArray[0].value);
+        var defaultValueIsProp = bt.isObjectProperty(defaultArray[0].value);
         /**
          * This means the default value is formatted like so: `default () { return {} }`
          */
-        const defaultValueIsObjectMethod = bt.isObjectMethod(defaultArray[0].value);
+        var defaultValueIsObjectMethod = bt.isObjectMethod(defaultArray[0].value);
         // objects and arrays should try to extract the body from functions
         if (propType === 'object' || propType === 'array') {
             if (defaultValueIsProp) {
                 /* TODO: add correct type info here ↓ */
-                const defaultFunction = defaultArray[0].get('value');
-                const isArrowFunction = bt.isArrowFunctionExpression(defaultFunction.node);
-                const isOldSchoolFunction = bt.isFunctionExpression(defaultFunction.node);
+                var defaultFunction = defaultArray[0].get('value');
+                var isArrowFunction = bt.isArrowFunctionExpression(defaultFunction.node);
+                var isOldSchoolFunction = bt.isFunctionExpression(defaultFunction.node);
                 // if default is undefined or null, literals are allowed
                 if (bt.isNullLiteral(defaultFunction.node) ||
                     (bt.isIdentifier(defaultFunction.node) && defaultFunction.node.name === 'undefined')) {
@@ -344,27 +454,27 @@ function describeDefault(propPropertiesPath, propDescriptor, propType) {
                 }
                 // retrieve the function "body" from the arrow function
                 if (isArrowFunction) {
-                    const arrowFunctionBody = defaultFunction.get('body');
+                    var arrowFunctionBody = defaultFunction.get('body');
                     // arrow function looks like `() => { return {} }`
                     if (bt.isBlockStatement(arrowFunctionBody.node)) {
-                        const rawValueParsed = getRawValueParsedFromFunctionsBlockStatementNode(arrowFunctionBody.node);
-                        if (rawValueParsed) {
+                        var rawValueParsed_1 = getRawValueParsedFromFunctionsBlockStatementNode(arrowFunctionBody.node);
+                        if (rawValueParsed_1) {
                             propDescriptor.defaultValue = {
                                 func: false,
-                                value: rawValueParsed
+                                value: rawValueParsed_1
                             };
                             return;
                         }
                     }
                     if (bt.isArrayExpression(arrowFunctionBody.node) ||
                         bt.isObjectExpression(arrowFunctionBody.node)) {
-                        const rawCode = (0, recast_1.print)(arrowFunctionBody.node).code;
-                        const value = ((_a = arrowFunctionBody.node.extra) === null || _a === void 0 ? void 0 : _a.parenthesized)
+                        var rawCode = (0, recast_1.print)(arrowFunctionBody.node).code;
+                        var value = ((_a = arrowFunctionBody.node.extra) === null || _a === void 0 ? void 0 : _a.parenthesized)
                             ? rawCode.slice(1, rawCode.length - 1)
                             : rawCode;
                         propDescriptor.defaultValue = {
                             func: false,
-                            value
+                            value: value
                         };
                         return;
                     }
@@ -379,11 +489,11 @@ function describeDefault(propPropertiesPath, propDescriptor, propType) {
             // defaultValue was either an ObjectMethod or an oldSchoolFunction
             // in either case we need to retrieve the blockStatement and work with that
             /* todo: add correct type info here ↓ */
-            const defaultBlockStatement = defaultValueIsObjectMethod
+            var defaultBlockStatement = defaultValueIsObjectMethod
                 ? defaultArray[0].get('body')
                 : defaultArray[0].get('value').get('body');
-            const defaultBlockStatementNode = defaultBlockStatement.node;
-            const rawValueParsed = getRawValueParsedFromFunctionsBlockStatementNode(defaultBlockStatementNode);
+            var defaultBlockStatementNode = defaultBlockStatement.node;
+            var rawValueParsed = getRawValueParsedFromFunctionsBlockStatementNode(defaultBlockStatementNode);
             if (rawValueParsed) {
                 propDescriptor.defaultValue = {
                     func: false,
@@ -395,11 +505,11 @@ function describeDefault(propPropertiesPath, propDescriptor, propType) {
         // otherwise the rest should return whatever there is
         if (defaultValueIsProp) {
             // in this case, just return the rawValue
-            let defaultPath = defaultArray[0].get('value');
+            var defaultPath = defaultArray[0].get('value');
             if (bt.isTSAsExpression(defaultPath.value)) {
                 defaultPath = defaultPath.get('expression');
             }
-            const rawValue = (0, recast_1.print)(defaultPath).code;
+            var rawValue = (0, recast_1.print)(defaultPath).code;
             propDescriptor.defaultValue = {
                 func: bt.isFunction(defaultPath.node),
                 value: rawValue
@@ -408,13 +518,13 @@ function describeDefault(propPropertiesPath, propDescriptor, propType) {
         }
         if (defaultValueIsObjectMethod) {
             // in this case, just the function needs to be reconstructed a bit
-            const defaultObjectMethod = defaultArray[0].get('value');
-            const paramNodeArray = defaultObjectMethod.node.params;
-            const params = paramNodeArray.map((p) => p.name).join(', ');
-            const defaultBlockStatement = defaultArray[0].get('body');
-            const rawValue = (0, recast_1.print)(defaultBlockStatement).code;
+            var defaultObjectMethod = defaultArray[0].get('value');
+            var paramNodeArray = defaultObjectMethod.node.params;
+            var params = paramNodeArray.map(function (p) { return p.name; }).join(', ');
+            var defaultBlockStatement = defaultArray[0].get('body');
+            var rawValue = (0, recast_1.print)(defaultBlockStatement).code;
             // the function should be reconstructed as "old-school" function, because they have the same handling of "this", whereas arrow functions do not.
-            const rawValueParsed = `function(${params}) ${rawValue.trim()}`;
+            var rawValueParsed = "function(".concat(params, ") ").concat(rawValue.trim());
             propDescriptor.defaultValue = {
                 func: true,
                 value: rawValueParsed
@@ -426,31 +536,41 @@ function describeDefault(propPropertiesPath, propDescriptor, propType) {
 }
 exports.describeDefault = describeDefault;
 function describeValues(propPropertiesPath, propDescriptor, ast, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (propDescriptor.values) {
-            return;
-        }
-        const validatorArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('validator'));
-        if (validatorArray.length) {
-            const validatorNode = validatorArray[0].get('value').node;
-            const values = yield (0, parseValidator_1.default)(validatorNode, ast, options);
-            if (values) {
-                propDescriptor.values = values;
+    return __awaiter(this, void 0, void 0, function () {
+        var validatorArray, validatorNode, values;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (propDescriptor.values) {
+                        return [2 /*return*/];
+                    }
+                    validatorArray = propPropertiesPath.filter((0, getPropsFilter_1.default)('validator'));
+                    if (!validatorArray.length) return [3 /*break*/, 2];
+                    validatorNode = validatorArray[0].get('value').node;
+                    return [4 /*yield*/, (0, parseValidator_1.default)(validatorNode, ast, options)];
+                case 1:
+                    values = _a.sent();
+                    if (values) {
+                        propDescriptor.values = values;
+                    }
+                    _a.label = 2;
+                case 2: return [2 /*return*/];
             }
-        }
+        });
     });
 }
 function extractValuesFromTags(propDescriptor) {
+    var _a;
     if (propDescriptor.tags && propDescriptor.tags.values) {
-        const values = propDescriptor.tags.values.map(tag => {
-            const description = tag.description;
-            const choices = typeof description === 'string' ? description.split(',') : undefined;
+        var values = propDescriptor.tags.values.map(function (tag) {
+            var description = tag.description;
+            var choices = typeof description === 'string' ? description.split(',') : undefined;
             if (choices) {
-                return choices.map((v) => v.trim());
+                return choices.map(function (v) { return v.trim(); });
             }
             return [];
         });
-        propDescriptor.values = [].concat(...values);
+        propDescriptor.values = (_a = []).concat.apply(_a, __spreadArray([], __read(values), false));
         delete propDescriptor.tags.values;
     }
 }
@@ -461,20 +581,22 @@ exports.extractValuesFromTags = extractValuesFromTags;
  * @returns name of the model prop, null if none
  */
 function getModelPropName(path) {
-    const modelPath = path
+    var modelPath = path
         .get('properties')
-        .filter((p) => bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('model')(p));
+        .filter(function (p) { return bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('model')(p); });
     if (!modelPath.length) {
         return null;
     }
-    const modelPropertyNamePath = modelPath.length &&
-        modelPath[0]
-            .get('value')
-            .get('properties')
-            .filter((p) => bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('prop')(p));
+    var modelValue = modelPath.length && modelPath[0].get('value');
+    if (!bt.isObjectExpression(modelValue.node)) {
+        return null;
+    }
+    var modelPropertyNamePath = modelValue
+        .get('properties')
+        .filter(function (p) { return bt.isObjectProperty(p.node) && (0, getPropsFilter_1.default)('prop')(p); });
     if (!modelPropertyNamePath.length) {
         return null;
     }
-    const valuePath = modelPropertyNamePath[0].get('value');
+    var valuePath = modelPropertyNamePath[0].get('value');
     return bt.isStringLiteral(valuePath.node) ? valuePath.node.value : null;
 }

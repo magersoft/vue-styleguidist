@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isInterpolationNode = exports.isCompoundExpressionNode = exports.isSimpleExpressionNode = exports.isAttributeNode = exports.isDirectiveNode = exports.isBaseElementNode = exports.isCommentNode = exports.isTextNode = void 0;
-const NodeTypesLitteral = {
+var NodeTypesLitteral = {
     ELEMENT: 1,
     TEXT: 2,
     COMMENT: 3,

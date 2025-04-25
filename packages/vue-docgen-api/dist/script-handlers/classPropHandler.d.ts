@@ -1,7 +1,7 @@
 import * as bt from '@babel/types';
 import { NodePath } from 'ast-types/lib/node-path';
 import Documentation from '../Documentation';
-import { ParseOptions } from '../parse';
+import type { ParseOptions } from '../types';
 /**
  * Extracts prop information from a class-style VueJs component
  * @param documentation
